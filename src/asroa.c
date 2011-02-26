@@ -19,6 +19,7 @@
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
+
 #include "include/PWM_gen.h"
 #include "include/IK_calc.h"
 #include "include/buttons.h"
@@ -26,56 +27,54 @@
 
 static int delay_counter = 0;
 static unsigned char which_button = 0x00;
+unsigned char port_val = 0x00;
+unsigned char ocr_val = 0x80;
 
 int main()
 {
 
-	unsigned int servo_pos[3]; // Does not include gripper
+	//unsigned int servo_pos[3]; // Does not include gripper
 
+	TCCR2 |= 0x40 + 0x20 + 0x04;
+	SREG = 0x80; //general interrupt enable
+	OCR2 = 0x0B;
 	DDRA = 0x00; // Input to ADC
 	DDRB = 0xFF;
-	DDRC = 0x00; // Input from Buttons
+	DDRD = 0x80; // Input from Buttons, output for PIND7 (OC2)
 
-	PORTC = 0xFF;
-	sei();
+	//PORTB = 0xFF;
+	PORTD = 0xFF;
 
-
-	ADCSRA = 0x80;
+	//ADCSRA = 0x80;
 
 	/*
 	 * Setting up timers and PWM
+	 * Timer input clock is clk/64
+	 * Phase-Correct PWM Mode used (8-bit)
 	 *
-	 * Each TCCRx register has 8 bits
-	 * Bits 0-2 -> CSxy (clock select)
-	 *	Scaling factor of 64 used
-	 * Bit 3    -> WGMx1 (wavegen mode)
-	 *	Set to Phase Correct PWM (0)
-	 * Bits 4-5 -> COMxy (comp-out mode)
-	 *	Set to up-set and down-clear
-	 * Bit 6    -> WGMx0 (wavegen mode)
-	 *	Set to Phase Correct PWM (1)
-	 * Bit 7    -> FOCx *must be '0'*
-	 * 'x' is register number (0-
-	 * 'y' is bit number
 	 */
 
-	TCCR0 |= 0x73; // 2'b01110011
-	TCCR1A |= 0x73;
-	TCCR1B |= 0x73;
-	TCCR2 |= 0x73;
+
+	// Enable timer 0 compare interrupt
+	TIMSK |= 0x80;
+	//OCR0 = 0x50;
+
+	//TCCR0 |= 0x2B;
+	//TCCR1A |= WGM10 + COM1A1 + COM1A0;
+	//TCCR1B |= CS11 + CS10;
 
 
-	// Enable timer 0 interrupt
-	TIMSK |= 0x01;
 
-	OCR0 = 0x80;
+	//enable interrupts
+	sei();
 
-	while(1)
-	{
-		if(which_button == B0)
-			OCR0 = 0xDA;
-		else if(which_button == B1)
-			OCR0 = 0xC0;
+	while(1) {
+		if(which_button == B0) {
+			ocr_val = 0xDA;
+		}
+		else if(which_button == B1) {
+			ocr_val = 0xC0;
+		}
 	}	
 }
 
@@ -92,10 +91,23 @@ int main()
 
 ISR(TIMER0_COMP_vect)
 {
-	if(delay_counter < BUTTONCHECKDELAY)
+	OCR0 = ocr_val;
+	if(delay_counter < BUTTONCHECKDELAY) {
 		delay_counter++;
-	else
-	{
+	}
+	else {
+		delay_counter = 0;
+		which_button = check_buttons();
+	}
+}
+
+ISR(TIMER2_COMP_vect)
+{
+	OCR2 = ocr_val;
+	if(delay_counter < BUTTONCHECKDELAY) {
+		delay_counter++;
+	}
+	else {
 		delay_counter = 0;
 		which_button = check_buttons();
 	}

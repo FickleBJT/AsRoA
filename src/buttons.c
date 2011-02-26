@@ -28,9 +28,9 @@ static unsigned char which_button = 0x00;
 
 unsigned char check_buttons(void) {
 	previous = current;
-	if(PINC != 0xFF)
+	if((PORTD | 0x20) != 0xFF)
 	{
-		current = PINC;
+		current = PIND;
 			if(previous == 0xFF)
 			{
 				button_pressed = TRUE;
