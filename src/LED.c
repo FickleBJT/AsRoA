@@ -18,5 +18,16 @@
 ********************************************************************/
 
 #include <avr/io.h>
+#include "include/LED.h"
 
 
+void init_leds(void)
+{
+	DDRB = 0xFF;
+	PORTB = 0xFF;
+}
+
+void write_leds(unsigned char led_port)
+{
+	PORTB = led_port;
+}

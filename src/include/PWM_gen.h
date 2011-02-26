@@ -17,4 +17,6 @@
 * along with AsRoA. If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 
+void init_pwm(void);
+
 unsigned int ocr_to_pwm_conv(unsigned int);

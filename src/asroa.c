@@ -19,58 +19,40 @@
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
-
 #include "include/PWM_gen.h"
 #include "include/IK_calc.h"
+#include "include/adc.h"
 #include "include/buttons.h"
+#include "include/extra_macros.h"
+#include "include/LED.h"
 
 
 static int delay_counter = 0;
 static unsigned char which_button = 0x00;
-unsigned char port_val = 0x00;
-unsigned char ocr_val = 0x80;
+unsigned char ocr_val = 0xC0;
+unsigned int samples[MAX_CHANNELS-1];
+
+
+
 
 int main()
 {
-
-	//unsigned int servo_pos[3]; // Does not include gripper
-
-	TCCR2 |= 0x40 + 0x20 + 0x04;
-	SREG = 0x80; //general interrupt enable
-	OCR2 = 0x0B;
-	DDRA = 0x00; // Input to ADC
-	DDRB = 0xFF;
-	DDRD = 0x80; // Input from Buttons, output for PIND7 (OC2)
-
-	//PORTB = 0xFF;
-	PORTD = 0xFF;
-
-	//ADCSRA = 0x80;
-
-	/*
-	 * Setting up timers and PWM
-	 * Timer input clock is clk/64
-	 * Phase-Correct PWM Mode used (8-bit)
-	 *
-	 */
+	init_leds();
+	init_adc();
+	init_pwm();
 
 
-	// Enable timer 0 compare interrupt
-	TIMSK |= 0x80;
-	//OCR0 = 0x50;
-
-	//TCCR0 |= 0x2B;
-	//TCCR1A |= WGM10 + COM1A1 + COM1A0;
-	//TCCR1B |= CS11 + CS10;
+	PORTD |= 0x7F;
 
 
-
-	//enable interrupts
+	//Interrupts
+	TIMSK |= TIMOVF2;
 	sei();
+
 
 	while(1) {
 		if(which_button == B0) {
-			ocr_val = 0xDA;
+			ocr_val = 0xC0;
 		}
 		else if(which_button == B1) {
 			ocr_val = 0xC0;
@@ -79,36 +61,28 @@ int main()
 }
 
 
+
+
 /*
  * Interrupt Vectors
- *
- * TIMER0_COMP_vect:
- * 	 Used to count the delay between
- *   button samples
- *   At an 8MHz clk, this should
- *   trigger approx every 4.07 ms
-*/
+ */
 
-ISR(TIMER0_COMP_vect)
+
+ISR(TIMER2_OVF_vect)
 {
-	OCR0 = ocr_val;
+	//OCR2 = ocr_val;
 	if(delay_counter < BUTTONCHECKDELAY) {
 		delay_counter++;
 	}
 	else {
 		delay_counter = 0;
-		which_button = check_buttons();
+	which_button = check_buttons();
+
 	}
 }
 
-ISR(TIMER2_COMP_vect)
+ISR(ADC_vect)
 {
-	OCR2 = ocr_val;
-	if(delay_counter < BUTTONCHECKDELAY) {
-		delay_counter++;
-	}
-	else {
-		delay_counter = 0;
-		which_button = check_buttons();
-	}
+	samples[(ADMUX & 0x0F)] = ADCH; // copy sample
+	// possibly increment ADC channel here?
 }

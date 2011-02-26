@@ -15,7 +15,7 @@ COMMON = -mmcu=$(MCU)
 
 ## Compile options common for all C compilation units.
 CFLAGS = $(COMMON)
-CFLAGS += -Wall -gdwarf-2 -std=gnu99         -DF_CPU=8386800UL -O0 -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums
+CFLAGS += -Wall -gdwarf-2 -std=gnu99             -DF_CPU=3686400UL -O0 -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums
 CFLAGS += -MD -MP -MT $(*F).o -MF dep/$(@F).d 
 
 ## Assembly specific flags
@@ -37,7 +37,7 @@ HEX_EEPROM_FLAGS += --change-section-lma .eeprom=0 --no-change-warnings
 
 
 ## Objects that must be built in order to link
-OBJECTS = adc.o asroa.o buttons.o IK_calc.o lcd.o LED.o PWM_gen.o 
+OBJECTS = adc.o asroa.o buttons.o IK_calc.o LED.o PWM_gen.o 
 
 ## Objects explicitly added by the user
 LINKONLYOBJECTS = 
@@ -56,9 +56,6 @@ buttons.o: ../buttons.c
 	$(CC) $(INCLUDES) $(CFLAGS) -c  $<
 
 IK_calc.o: ../IK_calc.c
-	$(CC) $(INCLUDES) $(CFLAGS) -c  $<
-
-lcd.o: ../lcd.c
 	$(CC) $(INCLUDES) $(CFLAGS) -c  $<
 
 LED.o: ../LED.c

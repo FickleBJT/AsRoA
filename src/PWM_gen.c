@@ -18,8 +18,18 @@
 ********************************************************************/
 
 #include <avr/io.h>
+#include "include/extra_macros.h"
 
 // Will only work properly with 8-bit uC's
+
+void init_pwm(void)
+{
+	TCCR2 |= WAVGEN20 + COMPMOD21 + CLKSEL21 + CLKSEL20; // Phase Correct PWM : clk/32
+	DDRD |= 0x80; // Set PIND7 as output for OC2
+	PORTD |= 0x80;
+	OCR2 = 0xB1; // 0xB1 should create 1500usec pulse
+}
+
 
 unsigned int pos_to_ocr_conv(unsigned int servo_pos)
 {

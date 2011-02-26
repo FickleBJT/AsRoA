@@ -17,28 +17,6 @@
 * along with AsRoA. If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 
-#define MAX_CHANNELS 8
+void init_leds(void);
 
-#define ENABLEADC    0x80
-#define STARTCONV    0x40
-#define AUTOTRIG     0x20
-#define ADCINTFLAG   0x10
-#define ADCINTENABLE 0x08
-#define ADCPRESCALE2 0x04
-#define ADCPRESCALE1 0x02
-#define ADCPRESCALE0 0x01
-
-#define VREF1        0x80
-#define VREF0		 0x40
-#define LADJUST      0x20
-#define MUX04		 0x10
-#define MUX03		 0x08
-#define MUX02		 0x04
-#define MUX01		 0x02
-#define MUX00		 0x01
-
-void init_adc(void);
-
-void take_sample(unsigned int);
-
-void start_freerun(void);
+void write_leds(unsigned char);
