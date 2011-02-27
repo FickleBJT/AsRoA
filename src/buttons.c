@@ -27,15 +27,15 @@ static unsigned char which_button = 0x00;
 
 
 unsigned char check_buttons(void) {
-	current = PIND;
-	if((PIND | 0x80) != 0xFF) {
-			if(previous == 0xFF) {
-				button_pressed = TRUE;
-				determine_which_button();
-			}
-			else if(previous != current) {
-				button_pressed = FALSE;
-			}
+	current = (PIND | 0x80);
+	if(current != 0xFF) {
+		if(previous == 0xFF) {
+			button_pressed = TRUE;
+			determine_which_button();
+		}
+		else if(previous != current) {
+			button_pressed = FALSE;
+		}
 	}
 	previous = current;
 

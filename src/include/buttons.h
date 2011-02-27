@@ -25,7 +25,7 @@
 #define B5 0x20
 #define B6 0x40
 #define B7 0x80
-#define BUTTONCHECKDELAY 8
+#define BUTTONCHECKDELAY 4
 #define FALSE 0
 #define TRUE 1
 

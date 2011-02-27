@@ -48,10 +48,7 @@ int main()
 
 
 	while(1) {
-		if((which_button & 0x80) == 0x80) {
-			write_leds(which_button);
-			which_button &= 0x7F;
-		}
+			write_leds(&which_button);
 		if(which_button == B1) {
 			OCR2 = 0xD1;
 		}

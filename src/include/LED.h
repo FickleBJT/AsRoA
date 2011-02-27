@@ -19,4 +19,4 @@
 
 void init_leds(void);
 
-void write_leds(unsigned char);
+void write_leds(unsigned char *);

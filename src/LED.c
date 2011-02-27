@@ -27,7 +27,15 @@ void init_leds(void)
 	PORTB = 0xFF;
 }
 
-void write_leds(unsigned char led_port)
+void write_leds(unsigned char *led_port)
 {
-	PORTB = ~(led_port & 0x7F);
+	if((*led_port & 0x80) == 0x80) {
+		PORTB = ~(*led_port & 0x7F);
+		*led_port &= 0x7F;
+	}
+}
+
+void clear_leds(void)
+{
+	PORTB = 0xFF;
 }
