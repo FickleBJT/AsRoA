@@ -28,8 +28,8 @@
 
 
 static int delay_counter = 0;
-static unsigned char which_button = 0x00;
-unsigned char ocr_val = 0xC0;
+unsigned char which_button = 0x00;
+unsigned char ocr_val = 0xB1;
 unsigned int samples[MAX_CHANNELS-1];
 
 
@@ -38,24 +38,25 @@ unsigned int samples[MAX_CHANNELS-1];
 int main()
 {
 	init_leds();
-	init_adc();
+	//init_adc();
 	init_pwm();
 
 
-	PORTD |= 0x7F;
-
-
 	//Interrupts
-	TIMSK |= TIMOVF2;
+	TIMSK |= OUTCOMP2;
 	sei();
 
 
 	while(1) {
-		if(which_button == B0) {
-			ocr_val = 0xC0;
+		if((which_button & 0x80) == 0x80) {
+			write_leds(which_button);
+			which_button &= 0x7F;
 		}
-		else if(which_button == B1) {
-			ocr_val = 0xC0;
+		if(which_button == B1) {
+			OCR2 = 0xD1;
+		}
+		else if(which_button == B3) {
+			OCR2 = 0x70;
 		}
 	}	
 }
@@ -68,16 +69,18 @@ int main()
  */
 
 
-ISR(TIMER2_OVF_vect)
+ISR(TIMER2_COMP_vect)
 {
-	//OCR2 = ocr_val;
+	//OCR2 = ocr_val; //doesn't work?
 	if(delay_counter < BUTTONCHECKDELAY) {
 		delay_counter++;
 	}
 	else {
 		delay_counter = 0;
-	which_button = check_buttons();
-
+		which_button = (check_buttons()); // The MSB is being used to tell the LEDs to update
+		if(which_button) {
+			which_button |= 0x80;
+		}
 	}
 }
 

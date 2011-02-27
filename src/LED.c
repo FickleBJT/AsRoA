@@ -29,5 +29,5 @@ void init_leds(void)
 
 void write_leds(unsigned char led_port)
 {
-	PORTB = led_port;
+	PORTB = ~(led_port & 0x7F);
 }

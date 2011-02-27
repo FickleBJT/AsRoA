@@ -25,7 +25,7 @@
 #define B5 0x20
 #define B6 0x40
 #define B7 0x80
-#define BUTTONCHECKDELAY 10 // Allows for 40.8 ms delay
+#define BUTTONCHECKDELAY 8
 #define FALSE 0
 #define TRUE 1
 

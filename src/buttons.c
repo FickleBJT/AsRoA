@@ -4,7 +4,7 @@
 * This file is part of AsRoA.
 *
 * AsRoA is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
+* it under the terms of the GNU GePORTD 0 18neral Public License as published by
 * the Free Software Foundation, either version 3 of the License, or
 * (at your option) any later version.
 *
@@ -27,26 +27,29 @@ static unsigned char which_button = 0x00;
 
 
 unsigned char check_buttons(void) {
-	previous = current;
-	if((PORTD | 0x20) != 0xFF)
-	{
-		current = PIND;
-			if(previous == 0xFF)
-			{
+	current = PIND;
+	if((PIND | 0x80) != 0xFF) {
+			if(previous == 0xFF) {
 				button_pressed = TRUE;
 				determine_which_button();
 			}
-			else if(previous != current)
+			else if(previous != current) {
 				button_pressed = FALSE;
+			}
 	}
-	if(button_pressed)
+	previous = current;
+
+	if(button_pressed) {
+		button_pressed = FALSE;
 		return which_button;
-	else
+	}
+	else {
 		return 0x00;
+	}
 
 }
 
 
 void determine_which_button(void) {
-	which_button = ~current;
+	which_button = (~current & 0x7F);
 }
