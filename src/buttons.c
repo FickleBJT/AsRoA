@@ -19,6 +19,7 @@
 
 #include <avr/io.h>
 #include "include/buttons.h"
+#include "include/PWM_gen.h"
 
 static unsigned int button_pressed = FALSE;
 static unsigned char current = 0xFF;
@@ -26,30 +27,80 @@ static unsigned char previous = 0xFF;
 static unsigned char which_button = 0x00;
 
 
-unsigned char check_buttons(void) {
+unsigned char check_buttons_hold(void) {
 	current = (PIND | 0x80);
-	if(current != 0xFF) {
-		if(previous == 0xFF) {
+	if(previous != current) {
+		if(current != 0xFF) {
 			button_pressed = TRUE;
 			determine_which_button();
 		}
-		else if(previous != current) {
+		else {
 			button_pressed = FALSE;
 		}
 	}
 	previous = current;
 
 	if(button_pressed) {
-		button_pressed = FALSE;
 		return which_button;
 	}
 	else {
 		return 0x00;
 	}
-
 }
 
 
 void determine_which_button(void) {
 	which_button = (~current & 0x7F);
+}
+
+
+unsigned char button_to_ocr(void)
+{
+		switch(which_button) {
+			case B0:
+			{
+				enable_pwm();
+				return 0x6B;
+			}
+			case B1:
+			{
+				enable_pwm();
+				return 0x80;
+			}
+			case B2:
+			{
+				enable_pwm();
+				return 0x94;
+			}
+			case B3:
+			{
+				enable_pwm();
+				return 0xA8;
+			}
+			case B4:
+			{
+				enable_pwm();
+				return 0xBB;
+			}
+			case B5:
+			{
+				enable_pwm();
+				return 0xD0;
+			}
+			case B6:
+			{
+				enable_pwm();
+				return 0xE4;
+			}
+			case B7:
+			{
+				enable_pwm();
+				return 0xF8;
+			}
+			default:
+			{
+				disable_pwm();
+				return 0;
+			}
+		}
 }

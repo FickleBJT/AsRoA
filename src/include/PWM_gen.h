@@ -19,4 +19,8 @@
 
 void init_pwm(void);
 
-unsigned int ocr_to_pwm_conv(unsigned int);
+void disable_pwm(void);
+
+void enable_pwm(void);
+
+unsigned char pos_to_ocr_conv(unsigned char);

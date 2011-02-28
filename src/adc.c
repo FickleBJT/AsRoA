@@ -24,7 +24,7 @@
 void init_adc()
 {
 	ADCSRA |= ENABLEADC + ADCINTENABLE + ADCPRESCALE2 + ADCPRESCALE1;
-	ADMUX |= VREF0 + LADJUST; // Use AVCC as VREF and left adjust result
+	ADMUX |= LADJUST; // Left adjust result
 	DDRA &= 0x00;
 }
 
@@ -38,4 +38,9 @@ void start_freerun(void)
 {
 	SFIOR &= 0x1F; // Set AUTOTRIG mode to "freerun" 
 	ADCSRA |= AUTOTRIG + STARTCONV; // Turn on AUTOTRIG mode
+}
+
+unsigned char adc_to_ocr(unsigned char sample_val)
+{
+	return sample_val; // Not correct	
 }

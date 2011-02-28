@@ -28,9 +28,10 @@
 
 
 static int delay_counter = 0;
+static int adc_count = 0;
 unsigned char which_button = 0x00;
 unsigned char ocr_val = 0xB1;
-unsigned int samples[MAX_CHANNELS-1];
+unsigned char samples[MAX_CHANNELS];
 
 
 
@@ -38,23 +39,18 @@ unsigned int samples[MAX_CHANNELS-1];
 int main()
 {
 	init_leds();
-	//init_adc();
-	init_pwm();
+	init_adc();
+	init_pwm(); // must later use "enable_pwm()"
 
 
 	//Interrupts
-	TIMSK |= OUTCOMP2;
+	TIMSK |= TIMOVF2;
 	sei();
 
 
 	while(1) {
-			write_leds(&which_button);
-		if(which_button == B1) {
-			OCR2 = 0xD1;
-		}
-		else if(which_button == B3) {
-			OCR2 = 0x70;
-		}
+		write_leds(which_button);
+		OCR2 = button_to_ocr();
 	}	
 }
 
@@ -66,7 +62,7 @@ int main()
  */
 
 
-ISR(TIMER2_COMP_vect)
+ISR(TIMER2_OVF_vect)
 {
 	//OCR2 = ocr_val; //doesn't work?
 	if(delay_counter < BUTTONCHECKDELAY) {
@@ -74,15 +70,21 @@ ISR(TIMER2_COMP_vect)
 	}
 	else {
 		delay_counter = 0;
-		which_button = (check_buttons()); // The MSB is being used to tell the LEDs to update
-		if(which_button) {
-			which_button |= 0x80;
-		}
+		which_button = (check_buttons_hold());
+	}
+	if(adc_count < ADCPERIOD) {
+		adc_count++;
+	}
+	else {
+		adc_count = 0;
+		take_sample(0);
 	}
 }
 
 ISR(ADC_vect)
 {
-	samples[(ADMUX & 0x0F)] = ADCH; // copy sample
+	samples[(ADMUX & 0x07)] = ADCH; // copy sample
 	// possibly increment ADC channel here?
+	//write_leds(samples[(ADMUX & 0x0F)]);
+	//OCR2 = (pos_to_ocr_conv(samples[ADMUX & 0x0F]));
 }

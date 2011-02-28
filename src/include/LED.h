@@ -19,4 +19,6 @@
 
 void init_leds(void);
 
-void write_leds(unsigned char *);
+void write_leds(unsigned char);
+
+void clear_leds(void);

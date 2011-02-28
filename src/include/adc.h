@@ -18,6 +18,7 @@
 ********************************************************************/
 
 #define MAX_CHANNELS 8
+#define ADCPERIOD 5
 
 #define ENABLEADC    0x80
 #define STARTCONV    0x40
@@ -42,3 +43,5 @@ void init_adc(void);
 void take_sample(unsigned int);
 
 void start_freerun(void);
+
+unsigned char adc_to_ocr(unsigned char);
