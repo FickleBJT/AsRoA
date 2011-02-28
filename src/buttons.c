@@ -24,7 +24,6 @@
 static unsigned int button_pressed = FALSE;
 static unsigned char current = 0xFF;
 static unsigned char previous = 0xFF;
-static unsigned char which_button = 0x00;
 
 
 unsigned char check_buttons_hold(void) {
@@ -32,7 +31,6 @@ unsigned char check_buttons_hold(void) {
 	if(previous != current) {
 		if(current != 0xFF) {
 			button_pressed = TRUE;
-			determine_which_button();
 		}
 		else {
 			button_pressed = FALSE;
@@ -41,7 +39,7 @@ unsigned char check_buttons_hold(void) {
 	previous = current;
 
 	if(button_pressed) {
-		return which_button;
+		return (~current & 0x7F);
 	}
 	else {
 		return 0x00;
@@ -49,58 +47,48 @@ unsigned char check_buttons_hold(void) {
 }
 
 
-void determine_which_button(void) {
-	which_button = (~current & 0x7F);
-}
 
-
-unsigned char button_to_ocr(void)
+unsigned char button_to_ocr(unsigned char which_button)
 {
 		switch(which_button) {
-			case B0:
-			{
+			case(B0): {
 				enable_pwm();
 				return 0x6B;
 			}
-			case B1:
-			{
+			case(B1): {
 				enable_pwm();
 				return 0x80;
 			}
-			case B2:
-			{
+			case(B2): {
 				enable_pwm();
 				return 0x94;
 			}
-			case B3:
-			{
+			case(B3): {
 				enable_pwm();
 				return 0xA8;
 			}
-			case B4:
-			{
+			case(B4): {
 				enable_pwm();
 				return 0xBB;
 			}
-			case B5:
-			{
+			case(B5): {
 				enable_pwm();
 				return 0xD0;
 			}
-			case B6:
-			{
+			case(B6): {
 				enable_pwm();
 				return 0xE4;
 			}
-			case B7:
-			{
+			case(B7): {
 				enable_pwm();
 				return 0xF8;
 			}
-			default:
-			{
-				disable_pwm();
-				return 0;
+			default: {
+				break;
 			}
 		}
+
+		disable_pwm();
+
+		return 0;
 }

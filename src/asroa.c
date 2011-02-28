@@ -49,8 +49,10 @@ int main()
 
 
 	while(1) {
+		which_button = check_buttons_hold();
 		write_leds(which_button);
-		OCR2 = button_to_ocr();
+		ocr_val = button_to_ocr(which_button);
+		OCR2 = ocr_val ? ocr_val : OCR2;
 	}	
 }
 
@@ -64,13 +66,12 @@ int main()
 
 ISR(TIMER2_OVF_vect)
 {
-	//OCR2 = ocr_val; //doesn't work?
 	if(delay_counter < BUTTONCHECKDELAY) {
 		delay_counter++;
 	}
 	else {
 		delay_counter = 0;
-		which_button = (check_buttons_hold());
+		which_button = check_buttons_hold();
 	}
 	if(adc_count < ADCPERIOD) {
 		adc_count++;

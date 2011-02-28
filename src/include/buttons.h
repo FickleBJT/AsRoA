@@ -30,10 +30,6 @@
 #define TRUE 1
 
 
-unsigned char check_buttons_hold(void);
+unsigned char check_buttons_hold();
 
-
-void determine_which_button(void); // May not need external availability
-
-
-unsigned char button_to_ocr(void);
+unsigned char button_to_ocr(unsigned char);

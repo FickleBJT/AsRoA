@@ -21,7 +21,6 @@
 #include <math.h>
 #include "include/extra_macros.h"
 
-// Will only work properly with 8-bit uC's
 
 void init_pwm(void)
 {
