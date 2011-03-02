@@ -24,23 +24,63 @@
 
 void init_pwm(void)
 {
+	TCCR0 |= WAVGEN00 + COMPMOD01 + CLKSEL01 + CLKSEL00; // Phase Correct PWM : clk/64
 	TCCR2 |= WAVGEN20 + COMPMOD21 + CLKSEL21 + CLKSEL20; // Phase Correct PWM : clk/32
-	// DDRD |= 0x80; // Set PIND7 as output for OC2
-	PORTD |= 0xFF;
-	OCR2 = 0xB1; // 0xB1 should create 1500usec pulse
+	DDRD |= 0x80; // Set PIND7 as output for OC2
+	DDRB |= 0x08;
+	PORTD |= 0x80;
+	PORTB |= 0x08;
+	OCR2 = 0xB1; // 0xB1 should create 1500usec pulse @ clk/32
+	OCR0 = 0x4C; // 0x9C should create 1500usec pulse @ clk/64
 }
 
-void enable_pwm(void)
+void enable_pwm(unsigned int channel) // channels 0-3
 {
-	DDRD |= 0x80;
+	switch(channel) {
+		case(0): {
+			TCCR0 |= COMPMOD01;
+		}
+		case(1): {
+			TCCR1A |= COMPMOD1A1;
+		}
+		case(2): {
+			TCCR1A |= COMPMOD1B1;
+		}
+		case(3): {
+			TCCR2 |= COMPMOD21;
+		}
+	}
 }
 
-void disable_pwm(void)
+void disable_pwm(unsigned int channel) // channel 0-3
 {
-	DDRD &= 0x7F;
+	switch(channel) {
+		case(0): {
+			TCCR0 &= ~COMPMOD01;
+		}
+		case(1): {
+			TCCR1A &= ~COMPMOD1A1;
+		}
+		case(2): {
+			TCCR1A &= ~COMPMOD1B1;
+		}
+		case(3): {
+			TCCR2 &= ~COMPMOD21;
+		}
+	}
 }
 
-unsigned char pos_to_ocr_conv(unsigned char servo_pos)
+
+/**********************************************
+ * joint can be a value from 0 to 4
+ * 0 - Base rotate
+ * 1 - Shoulder
+ * 2 - Elbow
+ * 3 - Wrist
+ * 4 - Gripper
+ *********************************************/
+
+unsigned char pwm_scale(unsigned char position, unsigned int joint)
 {
-	return servo_pos; // does not work yet
+	return position;
 }

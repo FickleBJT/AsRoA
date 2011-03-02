@@ -30,6 +30,10 @@
 #define TRUE 1
 
 
-unsigned char check_buttons_hold();
+void init_buttons(void);
+
+unsigned char check_buttons_hold(void);
+
+unsigned char check_buttons_click(void);
 
 unsigned char button_to_ocr(unsigned char);

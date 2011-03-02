@@ -19,8 +19,10 @@
 
 void init_pwm(void);
 
-void disable_pwm(void);
+void disable_pwm(unsigned int channel);
 
-void enable_pwm(void);
+void enable_pwm(unsigned int channel);
 
 unsigned char pos_to_ocr_conv(unsigned char);
+
+unsigned char pwm_scale(unsigned char, unsigned int);

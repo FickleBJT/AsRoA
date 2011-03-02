@@ -17,7 +17,7 @@
 * along with AsRoA. If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 
-#define MAX_CHANNELS 8
+#define MAX_CHANNELS 2
 #define ADCPERIOD 5
 
 #define ENABLEADC    0x80
@@ -40,8 +40,8 @@
 
 void init_adc(void);
 
-void take_sample(unsigned int);
+void take_sample(unsigned char);
 
 void start_freerun(void);
 
-unsigned char adc_to_ocr(unsigned char);
+unsigned char adc_scale(unsigned char, unsigned int);

@@ -24,7 +24,13 @@
 static unsigned int button_pressed = FALSE;
 static unsigned char current = 0xFF;
 static unsigned char previous = 0xFF;
+static unsigned char saved = 0xFF;
 
+
+void init_buttons(void) {
+	DDRD &= 0x80;
+	PORTD |= 0x7F;
+}
 
 unsigned char check_buttons_hold(void) {
 	current = (PIND | 0x80);
@@ -46,49 +52,57 @@ unsigned char check_buttons_hold(void) {
 	}
 }
 
-
+unsigned char check_buttons_click(void) {
+	current = (PIND | 0x80);
+	if((previous != current) && (current != 0xFF)) {
+		if(!button_pressed) {
+			button_pressed = TRUE;
+			saved = current;
+		}
+		else {
+			button_pressed = FALSE;
+		}
+	}
+	if(button_pressed) {
+		return (~saved & 0x7F);
+	}
+	else {
+		return 0x00;
+	}
+}
+		
+			
 
 unsigned char button_to_ocr(unsigned char which_button)
 {
 		switch(which_button) {
 			case(B0): {
-				enable_pwm();
-				return 0x6B;
+				return 0x40;
 			}
 			case(B1): {
-				enable_pwm();
-				return 0x80;
+				return 0x48;
 			}
 			case(B2): {
-				enable_pwm();
-				return 0x94;
+				return 0x50;
 			}
 			case(B3): {
-				enable_pwm();
-				return 0xA8;
+				return 0x58;
 			}
 			case(B4): {
-				enable_pwm();
-				return 0xBB;
+				return 0x60;
 			}
 			case(B5): {
-				enable_pwm();
-				return 0xD0;
+				return 0x68;
 			}
 			case(B6): {
-				enable_pwm();
-				return 0xE4;
+				return 0x70;
 			}
 			case(B7): {
-				enable_pwm();
-				return 0xF8;
+				return 0x78;
 			}
 			default: {
 				break;
 			}
 		}
-
-		disable_pwm();
-
 		return 0;
 }

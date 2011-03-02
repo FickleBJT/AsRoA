@@ -18,6 +18,7 @@
 ********************************************************************/
 
 #include <avr/io.h>
+#include <math.h>
 #include <avr/interrupt.h>
 #include "include/adc.h"
 
@@ -28,7 +29,7 @@ void init_adc()
 	DDRA &= 0x00;
 }
 
-void take_sample(unsigned int channel_num)
+void take_sample(unsigned char channel_num)
 {
 	ADCSRA &= ~AUTOTRIG; // We must be sure that only 1 sample will be taken
 	ADCSRA |= STARTCONV;
@@ -40,7 +41,15 @@ void start_freerun(void)
 	ADCSRA |= AUTOTRIG + STARTCONV; // Turn on AUTOTRIG mode
 }
 
-unsigned char adc_to_ocr(unsigned char sample_val)
+unsigned char adc_scale(unsigned char sample, unsigned int type)
 {
-	return sample_val; // Not correct	
+	switch(type) {
+		case(0): {
+			return (4.54*(sample-100)); // Based on flex sensor range 2.0 to 3.1
+		}
+		case(1): {
+			return (3.85*(sample-97)); // Based on voltage range of 1.9 to 3.2
+		}
+	}
+	return 0;
 }

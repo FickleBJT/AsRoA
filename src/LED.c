@@ -23,16 +23,16 @@
 
 void init_leds(void)
 {
-	DDRB = 0xFF;
-	PORTB = 0xFF;
+	DDRC = 0xFF;
+	PORTC = 0xFF;
 }
 
 void write_leds(unsigned char value)
 {
-		PORTB = ~(value);
+		PORTC = ~(value);
 }
 
 void clear_leds(void)
 {
-	PORTB = 0xFF;
+	PORTC = 0xFF;
 }

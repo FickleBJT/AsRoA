@@ -30,29 +30,26 @@
 static int delay_counter = 0;
 static int adc_count = 0;
 unsigned char which_button = 0x00;
-unsigned char ocr_val = 0xB1;
-unsigned char samples[MAX_CHANNELS];
+static unsigned char samples[MAX_CHANNELS] = {0};
+static unsigned char sample_num = 0;
 
 
 
 
 int main()
 {
-	init_leds();
+	//init_leds();
 	init_adc();
-	init_pwm(); // must later use "enable_pwm()"
+	init_pwm(); // must later use "enable_pwm(unsigned int)"
 
 
 	//Interrupts
-	TIMSK |= TIMOVF2;
+	TIMSK |= TIMOVF2 + TIMOVF0;
 	sei();
 
 
 	while(1) {
-		which_button = check_buttons_hold();
-		write_leds(which_button);
-		ocr_val = button_to_ocr(which_button);
-		OCR2 = ocr_val ? ocr_val : OCR2;
+		;
 	}	
 }
 
@@ -64,28 +61,38 @@ int main()
  */
 
 
-ISR(TIMER2_OVF_vect)
+ISR(TIMER0_OVF_vect)
 {
 	if(delay_counter < BUTTONCHECKDELAY) {
 		delay_counter++;
 	}
 	else {
 		delay_counter = 0;
-		which_button = check_buttons_hold();
+		which_button = check_buttons_click();
 	}
+}
+
+ISR(TIMER2_OVF_vect)
+{
 	if(adc_count < ADCPERIOD) {
 		adc_count++;
 	}
 	else {
 		adc_count = 0;
-		take_sample(0);
+		take_sample(sample_num);
 	}
 }
 
 ISR(ADC_vect)
 {
-	samples[(ADMUX & 0x07)] = ADCH; // copy sample
-	// possibly increment ADC channel here?
-	//write_leds(samples[(ADMUX & 0x0F)]);
-	//OCR2 = (pos_to_ocr_conv(samples[ADMUX & 0x0F]));
+	samples[sample_num] = adc_scale(ADCH, sample_num); // scale and copy sample
+	write_leds(samples[((which_button & 0x01)-1)]);
+	if(sample_num == (MAX_CHANNELS - 1)) {
+		sample_num = 0;
+		OCR0 = pwm_scale(samples[0]);
+		OCR2 = pwm_scale(samples[1]);
+	}
+	else {
+		sample_num = sample_num + 1;
+	}
 }
