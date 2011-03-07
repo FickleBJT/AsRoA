@@ -1,3 +1,6 @@
+#ifndef __ADC_H
+#define __ADC_H
+
 /********************************************************************
 * Copyright 2010, 2011 Ryan Bittner <rbittner@gwmail.gwu.edu>
 *
@@ -40,8 +43,12 @@
 
 void init_adc(void);
 
-void take_sample(unsigned char);
+void take_sample(void);
 
 void start_freerun(void);
 
-unsigned char adc_scale(unsigned char, unsigned int);
+unsigned int adc_scale(unsigned int sample, unsigned int type);
+
+void adc_set_channel(unsigned int channel_num);
+
+#endif

@@ -1,5 +1,7 @@
-/* Register Settings */
+#ifndef __EXTRA_MACROS_H
+#define __EXTRA_MACROS_H
 
+/* Register Settings */
 
 // TIMSK bits
 
@@ -56,3 +58,5 @@
 #define COMPMOD21  0x20
 #define WAVGEN20   0x40
 #define FORCECOMP  0x80 // Should always be zero
+
+#endif

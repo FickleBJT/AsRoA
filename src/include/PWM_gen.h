@@ -1,3 +1,6 @@
+#ifndef __PWM_GEN_H
+#define __PWM_GEN_H
+
 /********************************************************************
 * Copyright 2010, 2011 Ryan Bittner <rbittner@gwmail.gwu.edu>
 *
@@ -23,6 +26,6 @@ void disable_pwm(unsigned int channel);
 
 void enable_pwm(unsigned int channel);
 
-unsigned char pos_to_ocr_conv(unsigned char);
+unsigned char pwm_scale(unsigned char position, unsigned int joint);
 
-unsigned char pwm_scale(unsigned char, unsigned int);
+#endif

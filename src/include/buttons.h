@@ -1,3 +1,6 @@
+#ifndef __BUTTONS_H
+#define __BUTTONS_H
+
 /********************************************************************
 * Copyright 2010, 2011 Ryan Bittner <rbittner@gwmail.gwu.edu>
 *
@@ -36,4 +39,4 @@ unsigned char check_buttons_hold(void);
 
 unsigned char check_buttons_click(void);
 
-unsigned char button_to_ocr(unsigned char);
+#endif

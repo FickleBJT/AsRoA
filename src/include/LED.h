@@ -1,3 +1,6 @@
+#ifndef __LED_H
+#define __LED_H
+
 /********************************************************************
 * Copyright 2010, 2011 Ryan Bittner <rbittner@gwmail.gwu.edu>
 *
@@ -19,6 +22,8 @@
 
 void init_leds(void);
 
-void write_leds(unsigned char);
+void write_leds(unsigned char value);
 
 void clear_leds(void);
+
+#endif

@@ -17,9 +17,9 @@
 * along with AsRoA. If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 
-#include <avr/io.h>
-#include "include/LED.h"
+#include "LED.h"
 
+#include <avr/io.h>
 
 void init_leds(void)
 {
@@ -29,7 +29,7 @@ void init_leds(void)
 
 void write_leds(unsigned char value)
 {
-		PORTC = ~(value);
+	PORTC = ~(value);
 }
 
 void clear_leds(void)

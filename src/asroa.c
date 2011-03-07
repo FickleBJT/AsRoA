@@ -17,50 +17,46 @@
 * along with AsRoA. If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 
+#include "PWM_gen.h"
+#include "IK_calc.h"
+#include "adc.h"
+#include "buttons.h"
+#include "extra_macros.h"
+#include "LED.h"
+
 #include <avr/io.h>
 #include <avr/interrupt.h>
-#include "include/PWM_gen.h"
-#include "include/IK_calc.h"
-#include "include/adc.h"
-#include "include/buttons.h"
-#include "include/extra_macros.h"
-#include "include/LED.h"
-
 
 static int delay_counter = 0;
 static int adc_count = 0;
+
 unsigned char which_button = 0x00;
-static unsigned char samples[MAX_CHANNELS] = {0};
-static unsigned char sample_num = 0;
 
-
-
+static unsigned int samples[MAX_CHANNELS] = {0, 0};
+static unsigned int sample_num = 0;
 
 int main()
 {
-	//init_leds();
+	init_leds();
 	init_adc();
 	init_pwm(); // must later use "enable_pwm(unsigned int)"
 
+	enable_pwm(3);
+	enable_pwm(0);
 
 	//Interrupts
 	TIMSK |= TIMOVF2 + TIMOVF0;
+
 	sei();
 
-
 	while(1) {
-		;
+		; //do nothing
 	}	
 }
-
-
-
 
 /*
  * Interrupt Vectors
  */
-
-
 ISR(TIMER0_OVF_vect)
 {
 	if(delay_counter < BUTTONCHECKDELAY) {
@@ -79,20 +75,32 @@ ISR(TIMER2_OVF_vect)
 	}
 	else {
 		adc_count = 0;
-		take_sample(sample_num);
+		take_sample();
 	}
 }
 
 ISR(ADC_vect)
 {
-	samples[sample_num] = adc_scale(ADCH, sample_num); // scale and copy sample
-	write_leds(samples[((which_button & 0x01)-1)]);
-	if(sample_num == (MAX_CHANNELS - 1)) {
-		sample_num = 0;
-		OCR0 = pwm_scale(samples[0]);
-		OCR2 = pwm_scale(samples[1]);
+	if(which_button) {
+		if(which_button == B0) {
+			write_leds(samples[0]);
+		}
+		else if(which_button == B1) {
+			write_leds(samples[1]);
+		}
+		//write_leds(OCR2);
 	}
 	else {
-		sample_num = sample_num + 1;
+		clear_leds();
 	}
+
+	samples[sample_num++] = adc_scale(ADCH, 2); // scale and return sample
+
+	if(sample_num >= MAX_CHANNELS) {
+		sample_num = 0;
+		OCR0 = pwm_scale(samples[1], 1);
+		OCR2 = pwm_scale(samples[0], 1);
+	}
+
+	adc_set_channel(sample_num);
 }

@@ -1,3 +1,6 @@
+#ifndef __IK_CALC_H
+#define __IK_CALC_H
+
 /********************************************************************
 * Copyright 2010, 2011 Ryan Bittner <rbittner@gwmail.gwu.edu>
 *
@@ -17,4 +20,7 @@
 * along with AsRoA. If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 
-void IK_solver(int, int, int, unsigned int *);
+void IK_solver(int pos_x, int pos_y, int pos_z, unsigned int *solution);
+
+#endif
+

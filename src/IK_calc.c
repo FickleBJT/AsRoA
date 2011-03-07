@@ -17,10 +17,10 @@
 * along with AsRoA. If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 
+#include "IK_calc.h"
+
 #include <avr/io.h>
 #include <math.h>
-#include "include/IK_calc.h"
-
 
 void IK_solver(int pos_x, int pos_y, int pos_z, unsigned int *solution)
 {

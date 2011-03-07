@@ -17,10 +17,11 @@
 * along with AsRoA. If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 
+#include "adc.h"
+
 #include <avr/io.h>
 #include <math.h>
 #include <avr/interrupt.h>
-#include "include/adc.h"
 
 void init_adc()
 {
@@ -29,7 +30,7 @@ void init_adc()
 	DDRA &= 0x00;
 }
 
-void take_sample(unsigned char channel_num)
+void take_sample(void)
 {
 	ADCSRA &= ~AUTOTRIG; // We must be sure that only 1 sample will be taken
 	ADCSRA |= STARTCONV;
@@ -41,15 +42,34 @@ void start_freerun(void)
 	ADCSRA |= AUTOTRIG + STARTCONV; // Turn on AUTOTRIG mode
 }
 
-unsigned char adc_scale(unsigned char sample, unsigned int type)
+unsigned int adc_scale(unsigned int sample, unsigned int type)
 {
+	unsigned int scaled_sample;
+
 	switch(type) {
 		case(0): {
-			return (4.54*(sample-100)); // Based on flex sensor range 2.0 to 3.1
+			scaled_sample = 4.54 * (sample - 100); // Based on flex sensor range 2.0 to 3.1
+			break;
 		}
 		case(1): {
-			return (3.85*(sample-97)); // Based on voltage range of 1.9 to 3.2
+			scaled_sample = 3.85 * (sample - 97); // Based on voltage range of 1.9 to 3.2
+			break;
+		}
+		case(2): {
+			scaled_sample = sample;
+			break;
+		}
+		default: {
+			scaled_sample = 0;
+			break;
 		}
 	}
-	return 0;
+
+	return scaled_sample;
+}
+
+void adc_set_channel(unsigned int channel_num)
+{
+	ADMUX &= ~0x07;
+	ADMUX |= channel_num;
 }
