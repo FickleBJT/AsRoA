@@ -20,7 +20,9 @@
 * along with AsRoA. If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 
-void IK_solver(int pos_x, int pos_y, int pos_z, unsigned int *solution);
+#define RADTODEG 57.296
+
+void IK_solver(int pos_x, int pos_y, int pos_z, int *alpha, int *gamma);
 
 #endif
 

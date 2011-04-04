@@ -17,16 +17,7 @@
 * along with AsRoA. If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 
-#include "IK_calc.h"
 
-#include <avr/io.h>
-#include <math.h>
+int integrate(int y_val_one, int y_val_two, unsigned int x_ms);
 
-void IK_solver(int pos_x, int pos_y, int pos_z, int *alpha, int *beta)
-{
-	
-	float c_side = sqrt(pow(pos_x, 2) + pow(pos_y, 2));
-
-	*alpha = (int)(acos((-0.0065/c_side + pow(c_side, 2)/(0.241*c_side)))*RADTODEG + atan(pos_y/pos_x)); // Shoulder joint
-	*beta = (int)(acos(1.0228 - pow(c_side, 2)/0.03)*RADTODEG); // Elbow joint
-}
+int integrate_and_zero(unsigned y_val_one, unsigned y_val_two, unsigned int x_ms);
