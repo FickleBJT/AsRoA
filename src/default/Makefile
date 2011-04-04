@@ -40,7 +40,7 @@ HEX_EEPROM_FLAGS += --change-section-lma .eeprom=0 --no-change-warnings
 INCLUDES = -I"C:\Users\FickleBJT\Projects\AsRoA\src\include" 
 
 ## Objects that must be built in order to link
-OBJECTS = adc.o asroa.o buttons.o IK_calc.o LED.o PWM_gen.o 
+OBJECTS = adc.o asroa.o buttons.o IK_calc.o LED.o PWM_gen.o integration.o 
 
 ## Objects explicitly added by the user
 LINKONLYOBJECTS = 
@@ -65,6 +65,9 @@ LED.o: ../LED.c
 	$(CC) $(INCLUDES) $(CFLAGS) -c  $<
 
 PWM_gen.o: ../PWM_gen.c
+	$(CC) $(INCLUDES) $(CFLAGS) -c  $<
+
+integration.o: ../integration.c
 	$(CC) $(INCLUDES) $(CFLAGS) -c  $<
 
 ##Link

@@ -90,11 +90,11 @@ unsigned char pwm_scale(unsigned char position, unsigned int joint)
 			return (0.54*(position+35));
 		}
 		case(1): {
-			if(position >= 0xF8) {
-				return 0xF8;
+			if(position >= 0xFD) {
+				return 0xFD;
 			}
-			else if(position <= 0x08) {
-				return 0x08;
+			else if(position <= 0x02) {
+				return 0x02;
 			}
 			else {
 				return position;
