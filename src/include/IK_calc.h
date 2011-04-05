@@ -22,7 +22,7 @@
 
 #define RADTODEG 57.296
 
-void IK_solver(int pos_x, int pos_y, int pos_z, float *alpha, float *gamma);
+void IK_solver(unsigned char *pos_x, unsigned char *pos_y, float *alpha, float *gamma);
 
 #endif
 

@@ -28,20 +28,21 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-static int delay_counter = 0;
-static int adc_count = 0;
+static unsigned short delay_counter = 0;
+static unsigned short adc_count = 0;
 
 unsigned char which_button = 0x00;
 
-unsigned int last_sample = 0;
+unsigned char last_sample = 0;
 float last_vel = 0;
 float velocity = 0;
 float position = 0;
-unsigned char alpha = 0;
-unsigned char beta = 0;
-
-static unsigned int samples[MAX_CHANNELS] = {0};
-static unsigned int sample_num = 0;
+float alpha = 0.0;
+float beta = 0.0;
+static unsigned char x_in = 165;
+static unsigned char y_in = 25;
+static unsigned char samples[MAX_CHANNELS] = {76, 85};
+static unsigned short sample_num = 0;
 
 int main()
 {
@@ -58,10 +59,11 @@ int main()
 	sei();
 
 	while(1) {
-		integrate_and_zero((unsigned char)104, (unsigned char)60, 20, &velocity);
-		position += integrate(last_vel, velocity, 40, &position);
-		last_sample = samples[0];
-		last_vel = velocity;
+	//	integrate_and_zero((unsigned char)60, (unsigned char)116, 20, &velocity);
+	//	position += integrate(last_vel, velocity, 40, &position);
+	//	last_sample = samples[0];
+	//	last_vel = velocity;
+		IK_solver(&x_in, &y_in, &alpha, &beta);
 		 // wait for interrupts
 	}	
 }
@@ -111,7 +113,7 @@ ISR(ADC_vect)
 		clear_leds();
 	}
 
-	//samples[0] = ADCH;
+
 	samples[sample_num] = adc_scale(ADCH, 2); // scale and return sample
 	sample_num++;
 	if(sample_num >= MAX_CHANNELS) {
