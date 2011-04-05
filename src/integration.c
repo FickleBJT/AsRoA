@@ -20,64 +20,64 @@
 #include <avr/io.h>
 #include <math.h>
 
-int integrate_and_zero(unsigned int y_val_one, unsigned int y_val_two, unsigned int x_ms)
+static int slope_sign = 0;
+static char y_val_one_signed;
+static char y_val_two_signed;
+
+void integrate_and_zero(unsigned char y_val_one, unsigned char y_val_two, unsigned int x_ms, float *area)
 {
-	int area;
-	y_val_one = y_val_one - 128;
-	y_val_two = y_val_two - 128;
-	int slope_sign = (y_val_two - y_val_one);
+	y_val_one_signed = (char)(y_val_one - 128);
+	y_val_two_signed = (char)(y_val_two - 128);
+	slope_sign = (y_val_two_signed - y_val_one_signed);
 	
 	if(slope_sign >= 0) {
-		if(y_val_one >= 0) {
-			area = (((float)(0.5*slope_sign*x_ms)) + (float)(y_val_one*x_ms))/1000.0;
+		if(y_val_one >= 0x80) {
+			*area += (((float)(0.5*slope_sign*x_ms)) + (float)(y_val_one_signed*x_ms))/1000.0;
 		}
-		else if(y_val_two <= 0) {
-			area = (((float)(-0.5*slope_sign*x_ms)) - (float)(y_val_two*x_ms))/1000.0;
+		else if(y_val_two <= 0x80) {
+			*area += (((float)(-0.5*slope_sign*x_ms)) - (float)(y_val_two_signed*x_ms))/1000.0;
 		}
 		else { // This will cause unnecessary positive error with the current equation
-			area = ((float)(0.5*slope_sign*x_ms)/1000.0);
+			*area += ((float)(0.5*slope_sign*x_ms)/1000.0);
 		}
 	}
 	else {
-		if(y_val_two >= 0) {
-			area = (((float)(0.5*slope_sign*x_ms) + (float)(y_val_two*x_ms))/1000.0);
+		if(y_val_two >= 0x80) {
+			*area += (((float)(-0.5*slope_sign*x_ms) - (float)(y_val_two_signed*x_ms))/1000.0);
 		}
-		else if(y_val_one <= 0) { 
-			area = (((float)(0.5*slope_sign*x_ms) - (float)(y_val_one*x_ms))/1000.0);
+		else if(y_val_one <= 0x80) { 
+			*area += (((float)(0.5*slope_sign*x_ms) - (float)(y_val_one_signed*x_ms))/1000.0);
 		}
 		else { // This will cause unnecessary negative error with the current equation
-			area = ((float)(-0.5*slope_sign*x_ms)/(1000.0));
+			*area += ((float)(-0.5*slope_sign*x_ms)/(1000.0));
 		}
 	}
-	return area;
 }
 
-int integrate(int y_val_one, int y_val_two, unsigned int x_ms)
+void integrate(float y_val_one, float y_val_two, unsigned int x_ms, float *area)
 {
-	int area;
-	int slope_sign = (y_val_two - y_val_one);
+	slope_sign = ((int)y_val_two - (int)y_val_one);
 	if(slope_sign >= 0) {
 		if(y_val_one >= 0) {
-			area = (((float)(0.5*slope_sign*x_ms)) + (float)(y_val_one*x_ms))/1000.0;
+			*area += (((float)(0.5*slope_sign*x_ms)) + (float)(y_val_one*x_ms))/1000.0;
 		}
 		else if(y_val_two <= 0) {
-			area = (((float)(-0.5*slope_sign*x_ms)) - (float)(y_val_two*x_ms))/1000.0;
+			*area += (((float)(-0.5*slope_sign*x_ms)) - (float)(y_val_two*x_ms))/1000.0;
 		}
 		else { // This will cause unnecessary positive error with the current equation
-			area = ((float)(0.5*slope_sign*x_ms)/1000.0);
+			*area += ((float)(0.5*slope_sign*x_ms)/1000.0);
 		}
 	}
 	else {
 		if(y_val_two >= 0) {
-			area = (((float)(0.5*slope_sign*x_ms) + (float)(y_val_two*x_ms))/1000.0);
+			*area += (((float)(-0.5*slope_sign*x_ms) - (float)(y_val_two*x_ms))/1000.0);
 		}
 		else if(y_val_one <= 0) { 
-			area = (((float)(0.5*slope_sign*x_ms) - (float)(y_val_one*x_ms))/1000.0);
+			*area += (((float)(0.5*slope_sign*x_ms) + (float)(y_val_one*x_ms))/1000.0);
 		}
 		else { // This will cause unnecessary negative error with the current equation
-			area = ((float)(-0.5*slope_sign*x_ms)/(1000.0));
+			*area += ((float)(-0.5*slope_sign*x_ms)/(1000.0));
 		}
 	}
-	return area;
 }
 

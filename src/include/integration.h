@@ -18,6 +18,6 @@
 ********************************************************************/
 
 
-int integrate(int y_val_one, int y_val_two, unsigned int x_ms);
+float integrate(float y_val_one, float y_val_two, unsigned int x_ms, float *area);
 
-int integrate_and_zero(unsigned y_val_one, unsigned y_val_two, unsigned int x_ms);
+float integrate_and_zero(unsigned y_val_one, unsigned y_val_two, unsigned int x_ms, float *area);

@@ -22,11 +22,11 @@
 #include <avr/io.h>
 #include <math.h>
 
-void IK_solver(int pos_x, int pos_y, int pos_z, int *alpha, int *beta)
+void IK_solver(int pos_x, int pos_y, int pos_z, float *alpha, float *beta)
 {
 	
 	float c_side = sqrt(pow(pos_x, 2) + pow(pos_y, 2));
 
-	*alpha = (int)(acos((-0.0065/c_side + pow(c_side, 2)/(0.241*c_side)))*RADTODEG + atan(pos_y/pos_x)); // Shoulder joint
-	*beta = (int)(acos(1.0228 - pow(c_side, 2)/0.03)*RADTODEG); // Elbow joint
+	*alpha = (acos((-0.0065/c_side + pow(c_side, 2)/(0.241*c_side)))*RADTODEG + atan(pos_y/pos_x)); // Shoulder joint
+	*beta = (acos(1.0228 - pow(c_side, 2)/0.03)*RADTODEG); // Elbow joint
 }

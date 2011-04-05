@@ -34,29 +34,35 @@ static int adc_count = 0;
 unsigned char which_button = 0x00;
 
 unsigned int last_sample = 0;
-int last_vel = 0;
-int velocity = 0;
-int position = 0;
+float last_vel = 0;
+float velocity = 0;
+float position = 0;
+unsigned char alpha = 0;
+unsigned char beta = 0;
 
 static unsigned int samples[MAX_CHANNELS] = {0};
 static unsigned int sample_num = 0;
 
 int main()
 {
-	init_leds();
-	init_adc();
-	init_pwm(); // must later use "enable_pwm(unsigned int)"
+//	init_leds();
+//	init_adc();
+//	init_pwm(); // must later use "enable_pwm(unsigned int)"
 
-	enable_pwm(3);
-	enable_pwm(0);
+//	enable_pwm(3);
+//	enable_pwm(0);
 
 	//Interrupts
-	TIMSK |= TIMOVF2 + TIMOVF0;
+//	TIMSK |= TIMOVF2 + TIMOVF0;
 
 	sei();
 
 	while(1) {
-		; // wait for interrupts
+		integrate_and_zero((unsigned char)104, (unsigned char)60, 20, &velocity);
+		position += integrate(last_vel, velocity, 40, &position);
+		last_sample = samples[0];
+		last_vel = velocity;
+		 // wait for interrupts
 	}	
 }
 
@@ -92,32 +98,33 @@ ISR(ADC_vect)
 			write_leds(samples[0]);
 		}
 		else if(which_button == B1) {
-			write_leds(velocity);
+			write_leds(samples[1]);
 		}
 		else if(which_button == B2) {
-			write_leds(position);
+			write_leds((int)velocity);
 		}
 		else if(which_button == B3) {
-			
+			write_leds((int)position);
 		}
 	}
 	else {
 		clear_leds();
 	}
 
-	samples[0] = ADCH;
-	//samples[sample_num] = adc_scale(ADCH, 2); // scale and return sample
+	//samples[0] = ADCH;
+	samples[sample_num] = adc_scale(ADCH, 2); // scale and return sample
 	sample_num++;
 	if(sample_num >= MAX_CHANNELS) {
 		sample_num = 0;
 		//	OCR0 = (pwm_scale(samples[1], 1)-32);
-		velocity += integrate_and_zero(last_sample, samples[0], 100);
-		position += integrate(last_vel, velocity, 200);
-		last_sample = samples[0];
-		last_vel = velocity;
-
-		//OCR0 = pwm_scale(samples[0], 1);
-		OCR0 = pwm_scale((unsigned int)(position), 1);
+		//velocity += integrate(last_sample, samples[0], 10);
+		//position += integrate(last_vel, velocity, 20);
+		//last_sample = samples[0];
+		//last_vel = velocity;
+		//IK_solver(samples[0], samples[1], 0, &alpha, &beta);
+		//OCR0 = pwm_scale((int)alpha, 1);
+		OCR2 = pwm_scale(samples[0], 1);
+		OCR0 = pwm_scale((unsigned char)(velocity+128), 1);
 	}
 
 	adc_set_channel(sample_num);
