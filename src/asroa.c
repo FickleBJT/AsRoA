@@ -33,14 +33,18 @@ static unsigned short adc_count = 0;
 
 unsigned char which_button = 0x00;
 
-unsigned char last_sample = 0;
-float last_vel = 0;
-float velocity = 0;
-float position = 0;
+unsigned char last_sample_x = 0;
+unsigned char last_sample_y = 0;
+float velocity_x = 0;
+float last_vel_x = 0;
+float velocity_y = 0;
+float last_vel_y = 0;
+float position_x = 0;
+float position_y = 0;
 float alpha = 0.0;
 float beta = 0.0;
-unsigned char x_in = 59;
-unsigned char y_in = 132;
+//unsigned char x_in = 59;
+//unsigned char y_in = 132;
 static unsigned char samples[MAX_CHANNELS] = {0, 0};
 static unsigned int sample_num = 0;
 unsigned int start = 0;
@@ -52,21 +56,18 @@ int main()
 	init_pwm(); // must later use "enable_pwm(unsigned int)"
 
 	enable_pwm(3);
+	enable_pwm(1);
 	enable_pwm(0);
 
 	//Interrupts
-	TIMSK |= TIMOVF2 + TIMOVF0;
+	TIMSK |= TIMOVF2 + TIMOVF0 + TIMOVF1;
 
 	sei();
 
 	while(1) {
-	//	integrate_and_zero((unsigned char)60, (unsigned char)116, 20, &velocity);
-	//	position += integrate(last_vel, velocity, 40, &position);
-	//	last_sample = samples[0];
-	//	last_vel = velocity;
-	//	IK_solver(&x_in, &y_in, &alpha, &beta);
 		 // wait for interrupts
-	}	
+	}
+	return 0;
 }
 
 /*
@@ -81,6 +82,11 @@ ISR(TIMER0_OVF_vect)
 		delay_counter = 0;
 		which_button = check_buttons_click();
 	}
+}
+
+ISR(TIMER1_OVF_vect)
+{
+	
 }
 
 ISR(TIMER2_OVF_vect)
@@ -106,7 +112,7 @@ ISR(ADC_vect)
 			start = 1;
 		}
 		else if(which_button == B2) {
-			write_leds((unsigned char)alpha);
+			write_leds(samples[2]);
 			start = 1;
 		}
 		else if(which_button == B3) {
@@ -114,7 +120,8 @@ ISR(ADC_vect)
 			start = 1;
 		}
 		else if((which_button == B4) && (start == 1)) {
-			reset_velocity(&velocity, &last_vel);
+			reset_velocity(&velocity_x, &last_vel_x);
+			reset_velocity(&velocity_y, &last_vel_y);
 			start = 0;
 			write_leds(0x81);
 		}
@@ -129,19 +136,22 @@ ISR(ADC_vect)
 	sample_num++;
 	if(sample_num >= MAX_CHANNELS) {
 		sample_num = 0;
-		//	OCR0 = (pwm_scale(samples[1], 1)-32);
 		if(start) {
-			//integrate_and_zero(last_sample, samples[0], 10, &velocity);
-			//integrate(last_vel, velocity, 20, &position);
-			//last_sample = samples[0];
-			//last_vel = velocity;
+			integrate_and_zero(last_sample_x, samples[0], 10, &velocity_x);
+			integrate_and_zero(last_sample_y, samples[1], 10, &velocity_y);
+			integrate(last_vel_x, velocity_x, 20, &position_x);
+			integrate(last_vel_y, velocity_y, 20, &position_x);
+			last_sample_x = samples[0];
+			last_sample_y = samples[1];
+			last_vel_x = velocity_x;
+			last_vel_y = velocity_y;
 		}
-		//IK_solver(&samples[0], &samples[1], &alpha, &beta);
-		//OCR0 = pwm_scale((int)alpha, 1);
-		//OCR0 = pwm_scale(180-(alpha+45), 3);
-		//OCR2 = pwm_scale(beta, 3);
-		//OCR2 = pwm_scale(position, 1);
-		OCR0 = pwm_scale(255-samples[0], 0);
+
+		IK_solver(&samples[0], &samples[1], &alpha, &beta);
+
+		OCR0 = pwm_scale(180-(alpha+45), 3);
+		OCR2 = pwm_scale(beta, 3);
+		OCR1A = pwm_scale(255-samples[2], 0);
 	}
 
 	adc_set_channel(sample_num);
