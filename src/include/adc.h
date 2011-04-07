@@ -21,7 +21,7 @@
 ********************************************************************/
 
 #define MAX_CHANNELS 2
-#define ADCPERIOD 5
+#define ADCPERIOD 4
 
 #define ENABLEADC    0x80
 #define STARTCONV    0x40
@@ -47,7 +47,7 @@ void take_sample(void);
 
 void start_freerun(void);
 
-unsigned int adc_scale(unsigned int sample, unsigned int type);
+unsigned char adc_scale(unsigned char sample, unsigned int type);
 
 void adc_set_channel(unsigned int channel_num);
 

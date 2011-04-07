@@ -34,27 +34,6 @@ void init_buttons(void)
 	PORTD |= 0x7F;
 }
 
-unsigned char check_buttons_hold(void) 
-{
-	current = (PIND | 0x80);
-	if(previous != current) {
-		if(current != 0xFF) {
-			button_pressed = TRUE;
-		}
-		else {
-			button_pressed = FALSE;
-		}
-	}
-	previous = current;
-
-	if(button_pressed) {
-		return (~current & 0x7F);
-	}
-	else {
-		return 0x00;
-	}
-}
-
 unsigned char check_buttons_click(void) 
 {
 	current = (PIND | 0x80);

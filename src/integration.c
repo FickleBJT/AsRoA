@@ -24,10 +24,21 @@ static int slope_sign = 0;
 static char y_val_one_signed;
 static char y_val_two_signed;
 
+void reset_velocity(float *velocity, float *last_velocity)
+{
+	*velocity = 0;
+	*last_velocity = 0;
+}
+
+void reset_position(float *position, float *last_position)
+{
+
+}
+
 void integrate_and_zero(unsigned char y_val_one, unsigned char y_val_two, unsigned int x_ms, float *area)
 {
-	y_val_one_signed = (char)(y_val_one - 128);
-	y_val_two_signed = (char)(y_val_two - 128);
+	y_val_one_signed = (char)(y_val_one - 136);
+	y_val_two_signed = (char)(y_val_two - 136);
 	slope_sign = (y_val_two_signed - y_val_one_signed);
 	
 	if(slope_sign >= 0) {

@@ -26,8 +26,9 @@ static float c_side;
 
 void IK_solver(unsigned char *pos_x, unsigned char *pos_y, float *alpha, float *beta)
 {	
-	c_side = hypot(*pos_x/1000.0, *pos_y/1000.0);
-
-	*alpha = (acos(-0.0065/c_side + pow(c_side, 2)/(0.241*c_side)) + atan(*pos_y / *pos_x))*RADTODEG; // Shoulder joint
-	*beta = (acos(1.0228 - pow(c_side, 2)/0.03)*RADTODEG); // Elbow joint
+	c_side = hypot(*pos_x/1032.38, *pos_y/1032.38); // Should calibrate to size of arm
+	if(c_side < 0.247) {
+		*alpha = (acos((-0.0065 / c_side) + (pow(c_side, 2) / (0.2413 * c_side))) + atan2((float)*pos_y, (float)*pos_x)) * RADTODEG; // Shoulder joint
+		*beta = acos(1.0013 - (pow(c_side, 2) / 0.0306)) * RADTODEG; // Elbow joint
+	}
 }

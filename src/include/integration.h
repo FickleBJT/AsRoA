@@ -17,6 +17,9 @@
 * along with AsRoA. If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 
+void reset_velocity(float *velocity, float *last_vel);
+
+void reset_position(float *position, float *last_position);
 
 float integrate(float y_val_one, float y_val_two, unsigned int x_ms, float *area);
 

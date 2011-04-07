@@ -24,8 +24,8 @@
 
 void init_pwm(void)
 {
-	TCCR0 |= WAVGEN00 + COMPMOD01 + CLKSEL01 + CLKSEL00; // Phase Correct PWM : clk/64
-	TCCR2 |= WAVGEN20 + COMPMOD21 + CLKSEL21 + CLKSEL20; // Phase Correct PWM : clk/32
+	TCCR0 |= WAVGEN00 + COMPMOD01 + CLKSEL01; // Phase Correct PWM : clk/8
+	TCCR2 |= WAVGEN20 + COMPMOD21 + CLKSEL21; // Phase Correct PWM : clk/8
 
 	DDRD |= 0x80; // Set PIND7 as output for OC2
 	DDRB |= 0x08; // Set PINB3 as output for OC0
@@ -33,8 +33,8 @@ void init_pwm(void)
 	PORTD |= 0x80;
 	PORTB |= 0x08;
 
-	OCR2 = 0xB1; // 0xB1 should create 1500usec pulse @ clk/32
-	OCR0 = 0x4C; // 0x9C should create 1500usec pulse @ clk/64
+	OCR0 = 0x5C;
+	OCR2 = 0x5C;
 }
 
 void enable_pwm(unsigned int channel) // channels 0-3
@@ -99,6 +99,12 @@ unsigned char pwm_scale(unsigned char position, unsigned int joint)
 			else {
 				return position;
 			}
+		}
+		case(2): {
+			return (0.755*(position + 28));
+		}
+		case(3): {
+			return (0.665*(position + 47));
 		}
 		default: {
 			return 0;

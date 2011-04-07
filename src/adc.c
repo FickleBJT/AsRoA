@@ -42,9 +42,9 @@ void start_freerun(void)
 	ADCSRA |= AUTOTRIG + STARTCONV; // Turn on AUTOTRIG mode
 }
 
-unsigned int adc_scale(unsigned int sample, unsigned int type)
+unsigned char adc_scale(unsigned char sample, unsigned int type)
 {
-	unsigned int scaled_sample;
+	unsigned char scaled_sample;
 
 	switch(type) {
 		case(0): {
@@ -57,10 +57,6 @@ unsigned int adc_scale(unsigned int sample, unsigned int type)
 		}
 		case(2): {
 			scaled_sample = sample;
-			break;
-		}
-		default: {
-			scaled_sample = 0;
 			break;
 		}
 	}

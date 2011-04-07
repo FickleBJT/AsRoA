@@ -15,7 +15,7 @@ COMMON = -mmcu=$(MCU)
 
 ## Compile options common for all C compilation units.
 CFLAGS = $(COMMON)
-CFLAGS += -Wall -gdwarf-2 -std=gnu99                          -DF_CPU=3686400UL -O2 -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums
+CFLAGS += -Wall -gdwarf-2 -std=gnu99                                                 -DF_CPU=1843200UL -O3 -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums
 CFLAGS += -MD -MP -MT $(*F).o -MF dep/$(@F).d 
 
 ## Assembly specific flags
@@ -38,6 +38,9 @@ HEX_EEPROM_FLAGS += --change-section-lma .eeprom=0 --no-change-warnings
 
 ## Include Directories
 INCLUDES = -I"C:\Users\FickleBJT\Projects\AsRoA\src\include" 
+
+## Libraries
+LIBS = -lc -lm 
 
 ## Objects that must be built in order to link
 OBJECTS = adc.o asroa.o buttons.o IK_calc.o LED.o PWM_gen.o integration.o 

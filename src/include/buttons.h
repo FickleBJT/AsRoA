@@ -35,8 +35,6 @@
 
 void init_buttons(void);
 
-unsigned char check_buttons_hold(void);
-
 unsigned char check_buttons_click(void);
 
 #endif
