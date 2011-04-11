@@ -35,14 +35,19 @@ unsigned char which_button = 0x00;
 
 unsigned char last_sample_x = 0;
 unsigned char last_sample_y = 0;
+unsigned char last_sample_z = 0;
 float velocity_x = 0;
-float last_vel_x = 0;
 float velocity_y = 0;
+float velocity_z = 0;
+float last_vel_x = 0;
 float last_vel_y = 0;
+float last_vel_z = 0;
 float position_x = 0;
 float position_y = 0;
+float position_z = 0;
 float alpha = 0.0;
 float beta = 0.0;
+float theta = 0.0;
 //unsigned char x_in = 59;
 //unsigned char y_in = 132;
 static unsigned char samples[MAX_CHANNELS] = {0, 0};
@@ -53,19 +58,14 @@ int main()
 {
 	init_leds();
 	init_adc();
-	init_pwm(); // must later use "enable_pwm(unsigned int)"
+	init_pwm();
 
-	enable_pwm(3);
-	enable_pwm(1);
-	enable_pwm(0);
-
-	//Interrupts
-	TIMSK |= TIMOVF2 + TIMOVF0 + TIMOVF1;
+	TIMSK |= TIMOVF2 + TIMOVF0 + TIMOVF1; // Interrupts
 
 	sei();
 
 	while(1) {
-		 // wait for interrupts
+		; // wait for interrupts
 	}
 	return 0;
 }
@@ -86,7 +86,7 @@ ISR(TIMER0_OVF_vect)
 
 ISR(TIMER1_OVF_vect)
 {
-	
+	;
 }
 
 ISR(TIMER2_OVF_vect)
@@ -132,26 +132,31 @@ ISR(ADC_vect)
 	}
 
 
-	samples[sample_num] = adc_scale(ADCH, 2); // scale and return sample
+	samples[sample_num] = ADCH; // scale and return sample
 	sample_num++;
 	if(sample_num >= MAX_CHANNELS) {
 		sample_num = 0;
 		if(start) {
 			integrate_and_zero(last_sample_x, samples[0], 10, &velocity_x);
 			integrate_and_zero(last_sample_y, samples[1], 10, &velocity_y);
+			integrate_and_zero(last_sample_y, samples[2], 10, &velocity_z);
 			integrate(last_vel_x, velocity_x, 20, &position_x);
-			integrate(last_vel_y, velocity_y, 20, &position_x);
+			integrate(last_vel_y, velocity_y, 20, &position_y);
+			integrate(last_vel_z, velocity_z, 20, &position_z);
 			last_sample_x = samples[0];
 			last_sample_y = samples[1];
+			last_sample_z = samples[2];
 			last_vel_x = velocity_x;
 			last_vel_y = velocity_y;
+			last_vel_z = velocity_z;
 		}
 
-		IK_solver(&samples[0], &samples[1], &alpha, &beta);
+		IK_solver(samples[0], samples[1], &alpha, &beta);
 
-		OCR0 = pwm_scale(180-(alpha+45), 3);
-		OCR2 = pwm_scale(beta, 3);
-		OCR1A = pwm_scale(255-samples[2], 0);
+		OCR0 = pwm_scale(&theta, 0);
+		OCR1A = pwm_scale(&alpha, 1);
+		OCR1B = pwm_scale(&beta, 2);
+		OCR2 = pwm_scale((float *)&samples[2], 4);
 	}
 
 	adc_set_channel(sample_num);

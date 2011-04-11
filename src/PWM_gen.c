@@ -25,18 +25,19 @@
 void init_pwm(void)
 {
 	TCCR0 |= WAVGEN00 + COMPMOD01 + CLKSEL01; // Phase Correct PWM : clk/8
-	TCCR1A |= WAVGEN10 + COMPMOD1A1; // Phase Correct PWM : clk/8
+	TCCR1A |= WAVGEN10 + COMPMOD1A1 + COMPMOD1B1; // Phase Correct PWM : clk/8
 	TCCR1B |= CLKSEL11;
 	TCCR2 |= WAVGEN20 + COMPMOD21 + CLKSEL21; // Phase Correct PWM : clk/8
 
-	DDRD |= 0x80 + 0x20; // Set PIND7 as output for OC2 and PIND5 as output for OC1A
+	DDRD |= 0x80 + 0x20 + 0x10; // Set PIND7 as output for OC2 and PIND5 as output for OC1A
 	DDRB |= 0x08; // Set PINB3 as output for OC0
 
-	PORTD |= 0x80 + 0x20;
-	PORTB |= 0x08;
+	PORTD |= 0x80 + 0x20 + 0x10; // OC2 + OC1A + OC1B
+	PORTB |= 0x08; // OC1
 
 	OCR0 = 0x5C;
 	OCR1A = 0x5C;
+	OCR1B = 0x5C;
 	OCR2 = 0x5C;
 }
 
@@ -86,31 +87,34 @@ void disable_pwm(unsigned int channel) // channel 0-3
  * 4 - Gripper
  *********************************************/
 
-unsigned char pwm_scale(unsigned char position, unsigned int joint)
+unsigned char pwm_scale(float *position, unsigned int joint)
 {
 	switch(joint) {
 		case(0): {
-			return (0.9*(position-10));
+			return (unsigned char)(0.665f*(*position + 47.0f)); // Base Rotate
 		}
-		case(1): {
-			if(position >= 0xFD) {
-				return 0xFD;
-			}
-			else if(position <= 0x02) {
-				return 0x02;
-			}
-			else {
-				return position;
-			}
+		case(1): { 
+			return (unsigned char)(0.665f*((135.0f - *position) + 47.0f)); // Shoulder
 		}
 		case(2): {
-			return (0.755*(position + 28));
+			return (unsigned char)((0.665f*(*position + 47.0f)));
 		}
 		case(3): {
-			return (0.665*(position + 47));
+			;
 		}
-		default: {
-			return 0;
+		case(4): {
+			return (unsigned char)(0.9f*((255.0f - *position) - 10.0f)); // Gripper
+		}
+		default: { // Test of full range with boundary check
+			if(*position >= 254) {
+				return 0xFE;
+			}
+			else if((unsigned char)*position <= 1) {
+				return 0x01;
+			}
+			else {
+				return (unsigned char)*position;
+			}
 		}
 	}
 

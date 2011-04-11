@@ -42,27 +42,6 @@ void start_freerun(void)
 	ADCSRA |= AUTOTRIG + STARTCONV; // Turn on AUTOTRIG mode
 }
 
-unsigned char adc_scale(unsigned char sample, unsigned int type)
-{
-	unsigned char scaled_sample;
-
-	switch(type) {
-		case(0): {
-			scaled_sample = 4.54 * (sample - 100); // Based on flex sensor range 2.0 to 3.1
-			break;
-		}
-		case(1): {
-			scaled_sample = 3.85 * (sample - 97); // Based on voltage range of 1.9 to 3.2
-			break;
-		}
-		case(2): {
-			scaled_sample = sample;
-			break;
-		}
-	}
-
-	return scaled_sample;
-}
 
 void adc_set_channel(unsigned int channel_num)
 {
