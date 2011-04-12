@@ -50,7 +50,7 @@ float beta = 0.0;
 float theta = 0.0;
 //unsigned char x_in = 59;
 //unsigned char y_in = 132;
-static unsigned char samples[MAX_CHANNELS] = {0, 0};
+unsigned char samples[MAX_CHANNELS] = {0, 0};
 static unsigned int sample_num = 0;
 unsigned int start = 0;
 
@@ -86,7 +86,7 @@ ISR(TIMER0_OVF_vect)
 
 ISR(TIMER1_OVF_vect)
 {
-	;
+
 }
 
 ISR(TIMER2_OVF_vect)
@@ -122,6 +122,7 @@ ISR(ADC_vect)
 		else if((which_button == B4) && (start == 1)) {
 			reset_velocity(&velocity_x, &last_vel_x);
 			reset_velocity(&velocity_y, &last_vel_y);
+			reset_velocity(&velocity_z, &last_vel_y);
 			start = 0;
 			write_leds(0x81);
 		}
@@ -151,12 +152,12 @@ ISR(ADC_vect)
 			last_vel_z = velocity_z;
 		}
 
-		IK_solver(samples[0], samples[1], &alpha, &beta);
+		IK_solver_threed(samples[0], samples[1], samples[2], &alpha, &beta, &theta);
 
 		OCR0 = pwm_scale(&theta, 0);
 		OCR1A = pwm_scale(&alpha, 1);
 		OCR1B = pwm_scale(&beta, 2);
-		OCR2 = pwm_scale((float *)&samples[2], 4);
+		OCR2 = pwm_scale((float *)&samples[3], 4);
 	}
 
 	adc_set_channel(sample_num);

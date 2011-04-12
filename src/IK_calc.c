@@ -22,7 +22,7 @@
 #include <avr/io.h>
 #include <math.h>
 
-static float c_side;
+float c_side;
 
 void IK_solver(unsigned char pos_x, unsigned char pos_y, float *alpha, float *beta)
 {	
@@ -36,11 +36,14 @@ void IK_solver(unsigned char pos_x, unsigned char pos_y, float *alpha, float *be
 
 void IK_solver_threed(unsigned char pos_x, unsigned char pos_y, unsigned char pos_z, float *alpha, float *beta, float *theta)
 {
-	c_side = hypot(pos_x/1032.38, pos_y/1032.38);
+	c_side = hypot((float)pos_x / 1032.38, (float)pos_y / 1032.38);
 
-	if(c_side< 0.247) {
-		*alpha = (acos((0.014556f + (pow(pos_x, 2) + pow(pos_y, 2)) - 0.016129f) / (2.0f*0.012065f*c_side)) + atan2(pos_y, pos_x)) * RADTODEG;
+	if(c_side < 0.247) {
+		*alpha = (acos((pow(c_side, 2) - 0.00157f) / (0.2414f * c_side)) + atan2(pos_y, pos_x)) * RADTODEG;
+		//*alpha = gamma;
+		//*alpha += atan2(pos_y, pos_x) * RADTODEG;
+		//*alpha = (acos((0.01456f + (pow(apos_x, 2) + pow(apos_y, 2)) - 0.01613f) / (2.0f*0.01207f*c_side)) + atan2((float)pos_y, (float)pos_x)) * RADTODEG;
 		*beta = acos((0.030685f - pow(c_side, 2)) / (0.0306451f)) * RADTODEG;
-		*theta = atan2(pos_z, pos_x) * RADTODEG;
+		*theta = atan2((float)pos_z, (float)pos_x) * RADTODEG;
 	}
 }
