@@ -106,18 +106,22 @@ ISR(ADC_vect)
 		if(which_button == B0) {
 			write_leds(samples[0]);
 			start = 1;
+			beta = 60.0;
 		}
 		else if(which_button == B1) {
 			write_leds(samples[1]);
 			start = 1;
+			beta = 90.0;
 		}
 		else if(which_button == B2) {
 			write_leds(samples[2]);
 			start = 1;
+			beta = 135.0;
 		}
 		else if(which_button == B3) {
 			write_leds((unsigned char)beta);
 			start = 1;
+			beta = 160;
 		}
 		else if((which_button == B4) && (start == 1)) {
 			reset_velocity(&velocity_x, &last_vel_x);
@@ -152,12 +156,15 @@ ISR(ADC_vect)
 			last_vel_z = velocity_z;
 		}
 
-		IK_solver_threed(samples[0], samples[1], samples[2], &alpha, &beta, &theta);
+		beta = 90.0;
+		//IK_solver_threed(samples[0], samples[1], samples[2], &alpha, &beta, &theta);
 
-		OCR0 = pwm_scale(&theta, 0);
-		OCR1A = pwm_scale(&alpha, 1);
-		OCR1B = pwm_scale(&beta, 2);
-		OCR2 = pwm_scale((float *)&samples[3], 4);
+		OCR1B = 0x03E8;
+
+	//	OCR0 = pwm_scale(&theta, 0);
+	//	OCR1A = pwm_scale(&alpha, 1);
+	//	OCR1B = pwm_scale(&beta, 2);
+	//	OCR2 = pwm_scale((float *)&samples[3], 4);
 	}
 
 	adc_set_channel(sample_num);

@@ -36,7 +36,7 @@ void init_buttons(void)
 
 unsigned char check_buttons_click(void) 
 {
-	current = (PIND | 0x80);
+	current = (PIND | 0xB0);
 	if((previous != current) && (current != 0xFF)) {
 		if(!button_pressed) {
 			button_pressed = TRUE;
