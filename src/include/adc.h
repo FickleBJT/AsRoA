@@ -20,7 +20,7 @@
 * along with AsRoA. If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 
-#define MAX_CHANNELS 4
+#define MAX_CHANNELS 3
 #define ADCPERIOD 3
 
 #define ENABLEADC    0x80

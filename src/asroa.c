@@ -73,7 +73,7 @@ int main()
 /*
  * Interrupt Vectors
  */
-ISR(TIMER0_OVF_vect)
+ISR(TIMER0_OVF_vect) // Triggers every 4.08 ms @ 8 MHz
 {
 	if(delay_counter < BUTTONCHECKDELAY) {
 		delay_counter++;
@@ -89,7 +89,7 @@ ISR(TIMER1_OVF_vect)
 
 }
 
-ISR(TIMER2_OVF_vect)
+ISR(TIMER2_OVF_vect) // Triggers every 4.08 ms @ 8 MHz
 {
 	if(adc_count < ADCPERIOD) {
 		adc_count++;
@@ -106,34 +106,31 @@ ISR(ADC_vect)
 		if(which_button == B0) {
 			write_leds(samples[0]);
 			start = 1;
-			beta = 60.0;
 		}
 		else if(which_button == B1) {
 			write_leds(samples[1]);
 			start = 1;
-			beta = 90.0;
 		}
 		else if(which_button == B2) {
 			write_leds(samples[2]);
 			start = 1;
-			beta = 135.0;
 		}
 		else if(which_button == B3) {
 			write_leds((unsigned char)beta);
 			start = 1;
-			beta = 160;
+
 		}
 		else if((which_button == B4) && (start == 1)) {
 			reset_velocity(&velocity_x, &last_vel_x);
 			reset_velocity(&velocity_y, &last_vel_y);
-			reset_velocity(&velocity_z, &last_vel_y);
+			reset_velocity(&velocity_z, &last_vel_z);
 			start = 0;
 			write_leds(0x81);
 		}
 	}
 	else {
 		clear_leds();
-		start = 1;
+		start = 0;
 	}
 
 
@@ -156,15 +153,15 @@ ISR(ADC_vect)
 			last_vel_z = velocity_z;
 		}
 
-		beta = 90.0;
-		//IK_solver_threed(samples[0], samples[1], samples[2], &alpha, &beta, &theta);
+		IK_solver_threed(samples[0], samples[1], samples[2], &alpha, &beta, &theta);
+		//IK_solver(samples[0], samples[1], &alpha, &beta);
+		//beta = 90.0f;
+		//OCR0 = 0x96;
 
-		OCR1B = 0x03E8;
-
-	//	OCR0 = pwm_scale(&theta, 0);
-	//	OCR1A = pwm_scale(&alpha, 1);
-	//	OCR1B = pwm_scale(&beta, 2);
-	//	OCR2 = pwm_scale((float *)&samples[3], 4);
+		OCR0 = (unsigned char)pwm_scale(&theta, 0);
+		OCR1A = pwm_scale(&alpha, 1);
+		OCR1B = pwm_scale(&beta, 2);
+	//	OCR2 = (unsigned char)pwm_scale((float *)&samples[3], 4);
 	}
 
 	adc_set_channel(sample_num);

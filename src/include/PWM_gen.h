@@ -26,6 +26,6 @@ void disable_pwm(unsigned int channel);
 
 void enable_pwm(unsigned int channel);
 
-unsigned char pwm_scale(float *position, unsigned int joint);
+unsigned int pwm_scale(float *position, unsigned int joint);
 
 #endif

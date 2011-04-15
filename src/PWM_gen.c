@@ -24,10 +24,10 @@
 
 void init_pwm(void)
 {
-	TCCR0 |= WAVGEN00 + COMPMOD01 + CLKSEL01; // 8-bit Phase Correct PWM : clk/64
+	TCCR0 |= WAVGEN00 + COMPMOD01 + CLKSEL01 + CLKSEL00; // 8-bit Phase Correct PWM : clk/64
 	TCCR1A |= WAVGEN11 + WAVGEN10 + COMPMOD1A1 + COMPMOD1B1; //  10-bit Phase Correct PWM : clk/8
 	TCCR1B |= CLKSEL11;
-	TCCR2 |= WAVGEN20 + COMPMOD21 + CLKSEL21; // 8-bit Phase Correct PWM : clk/64
+	TCCR2 |= WAVGEN20 + COMPMOD21 + CLKSEL22; // 8-bit Phase Correct PWM : clk/64
 
 	DDRD |= 0x80 + 0x20 + 0x10; // Set PIND7 as output for OC2 and PIND5 as output for OC1A
 	DDRB |= 0x08; // Set PINB3 as output for OC0
@@ -36,8 +36,8 @@ void init_pwm(void)
 	PORTB |= 0x08; // OC1
 
 	OCR0 = 0x5C;
-	OCR1A = 0x5C;
-	OCR1B = 0x5C;
+	OCR1A = 0x02EC;
+	OCR1B = 0x02EC;
 	OCR2 = 0x5C;
 }
 
@@ -87,34 +87,42 @@ void disable_pwm(unsigned int channel) // channel 0-3
  * 4 - Gripper
  *********************************************/
 
-unsigned char pwm_scale(float *position, unsigned int joint)
+unsigned int pwm_scale(float *position, unsigned int joint)
 {
 	switch(joint) {
-		case(0): {
-			return (unsigned char)(0.665f*(*position + 47.0f)); // Base Rotate
+		case(0): { // Base Rotate
+			return (unsigned int)((0.6278f * (*position)) + 37.0f);
+			//return (unsigned int)((5.2296f * (*position)) + 294.0f); 
 		}
-		case(1): { 
-			return (unsigned char)(0.665f*((135.0f - *position) + 47.0f)); // Shoulder
+
+		case(1): { // Shoulder
+			if(*position < 135) {
+				return (unsigned int)((5.2296f * (135.0f - *position)) + 294.0f); 
+			}
+			else {
+				return 0x03CF;
+			}
 		}
-		case(2): {
-			return (unsigned char)((0.665f*(*position + 47.0f))); // Elbow
+
+		case(2): { // Elbow
+			if(*position < 135) {
+				return (unsigned int)(5.2296f * (*position) + 294.0f); 
+			}
+			else {
+				return 0x03CF;
+			}
 		}
+
 		case(3): {
 			;
 		}
-		case(4): {
-			return (unsigned char)(0.9f*((255.0f - *position) - 10.0f)); // Gripper
+
+		case(4): { // Gripper
+			return (unsigned char)(0.9f*((255.0f - *position) - 10.0f)); 
 		}
-		default: { // Test of full range with boundary check
-			if(*position >= 254) {
-				return 0xFE;
-			}
-			else if((unsigned char)*position <= 1) {
-				return 0x01;
-			}
-			else {
-				return (unsigned char)*position;
-			}
+
+		default: {
+			return (unsigned int)(*position);
 		}
 	}
 
