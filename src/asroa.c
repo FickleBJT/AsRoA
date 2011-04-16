@@ -50,7 +50,7 @@ float beta = 0.0;
 float theta = 0.0;
 //unsigned char x_in = 59;
 //unsigned char y_in = 132;
-unsigned char samples[MAX_CHANNELS] = {0, 0};
+unsigned char samples[MAX_CHANNELS] = {0, 0, 0, 0};
 static unsigned int sample_num = 0;
 unsigned int start = 0;
 
@@ -116,7 +116,7 @@ ISR(ADC_vect)
 			start = 1;
 		}
 		else if(which_button == B3) {
-			write_leds((unsigned char)beta);
+			write_leds(samples[3]);
 			start = 1;
 
 		}
@@ -155,13 +155,14 @@ ISR(ADC_vect)
 
 		IK_solver_threed(samples[0], samples[1], samples[2], &alpha, &beta, &theta);
 		//IK_solver(samples[0], samples[1], &alpha, &beta);
-		//beta = 90.0f;
-		//OCR0 = 0x96;
-
+	//	beta = 90.0f;
+	//	0CR2 = 0x40;
+	//	OCR1B = pwm_scale(&beta, 2);
+	//	theta = 0;
 		OCR0 = (unsigned char)pwm_scale(&theta, 0);
 		OCR1A = pwm_scale(&alpha, 1);
 		OCR1B = pwm_scale(&beta, 2);
-	//	OCR2 = (unsigned char)pwm_scale((float *)&samples[3], 4);
+	//	OCR2 = (unsigned char)pwm_scale((float *)(&samples[3]), 0);
 	}
 
 	adc_set_channel(sample_num);

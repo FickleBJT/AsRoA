@@ -27,13 +27,13 @@ void init_pwm(void)
 	TCCR0 |= WAVGEN00 + COMPMOD01 + CLKSEL01 + CLKSEL00; // 8-bit Phase Correct PWM : clk/64
 	TCCR1A |= WAVGEN11 + WAVGEN10 + COMPMOD1A1 + COMPMOD1B1; //  10-bit Phase Correct PWM : clk/8
 	TCCR1B |= CLKSEL11;
-	TCCR2 |= WAVGEN20 + COMPMOD21 + CLKSEL22; // 8-bit Phase Correct PWM : clk/64
+	TCCR2 |= WAVGEN20 + COMPMOD21 + CLKSEL21 + CLKSEL20; // 8-bit Phase Correct PWM : clk/64
 
 	DDRD |= 0x80 + 0x20 + 0x10; // Set PIND7 as output for OC2 and PIND5 as output for OC1A
 	DDRB |= 0x08; // Set PINB3 as output for OC0
 
 	PORTD |= 0x80 + 0x20 + 0x10; // OC2 + OC1A + OC1B
-	PORTB |= 0x08; // OC1
+	PORTB |= 0x08; // OC0
 
 	OCR0 = 0x5C;
 	OCR1A = 0x02EC;
@@ -118,7 +118,7 @@ unsigned int pwm_scale(float *position, unsigned int joint)
 		}
 
 		case(4): { // Gripper
-			return (unsigned char)(0.9f*((255.0f - *position) - 10.0f)); 
+			return (0.954f*((255.0f - *position) - 34.0f)); 
 		}
 
 		default: {
