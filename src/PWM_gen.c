@@ -27,13 +27,13 @@ void init_pwm(void)
 	TCCR0 |= WAVGEN00 + COMPMOD01 + CLKSEL01 + CLKSEL00; // 8-bit Phase Correct PWM : clk/64
 	TCCR1A |= WAVGEN11 + WAVGEN10 + COMPMOD1A1 + COMPMOD1B1; //  10-bit Phase Correct PWM : clk/8
 	TCCR1B |= CLKSEL11;
-	TCCR2 |= WAVGEN20 + COMPMOD21 + CLKSEL21 + CLKSEL20; // 8-bit Phase Correct PWM : clk/64
+	TCCR2 |= WAVGEN20 + COMPMOD21 + CLKSEL21 + CLKSEL20; // 8-bit Phase Correct PWM : clk/32
 
-	DDRD |= 0x80 + 0x20 + 0x10; // Set PIND7 as output for OC2 and PIND5 as output for OC1A
 	DDRB |= 0x08; // Set PINB3 as output for OC0
+	DDRD |= 0x80 + 0x20 + 0x10; // Set PIND7 as output for OC2 and PIND5/PIND4 as outputs for OC1A and OC1B
 
-	PORTD |= 0x80 + 0x20 + 0x10; // OC2 + OC1A + OC1B
 	PORTB |= 0x08; // OC0
+	PORTD |= 0x80 + 0x20 + 0x10; // OC2 + OC1A + OC1B
 
 	OCR0 = 0x5C;
 	OCR1A = 0x02EC;
@@ -87,17 +87,16 @@ void disable_pwm(unsigned int channel) // channel 0-3
  * 4 - Gripper
  *********************************************/
 
-unsigned int pwm_scale(float *position, unsigned int joint)
+float pwm_scale(float position, unsigned int joint)
 {
 	switch(joint) {
 		case(0): { // Base Rotate
-			return (unsigned int)((0.6278f * (*position)) + 37.0f);
-			//return (unsigned int)((5.2296f * (*position)) + 294.0f); 
+			return ((0.6278f * position) + 37.0f);
 		}
 
 		case(1): { // Shoulder
-			if(*position < 135) {
-				return (unsigned int)((5.2296f * (135.0f - *position)) + 294.0f); 
+			if(position < 135) {
+				return ((5.2296f * (135.0f - position)) + 294.0f); 
 			}
 			else {
 				return 0x03CF;
@@ -105,24 +104,24 @@ unsigned int pwm_scale(float *position, unsigned int joint)
 		}
 
 		case(2): { // Elbow
-			if(*position < 135) {
-				return (unsigned int)(5.2296f * (*position) + 294.0f); 
+			if(position < 135) {
+				return (5.2296f * (position) + 294.0f); 
 			}
 			else {
 				return 0x03CF;
 			}
 		}
 
-		case(3): {
-			;
+		case(3): { // Wrist
+			return position;
 		}
 
 		case(4): { // Gripper
-			return (0.954f*((255.0f - *position) - 34.0f)); 
+			return ((0.954f * (255 - position)) - 34.0f); 
 		}
 
 		default: {
-			return (unsigned int)(*position);
+			return position;
 		}
 	}
 

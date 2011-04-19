@@ -35,7 +35,7 @@ void IK_solver(unsigned char pos_x, unsigned char pos_y, float *alpha, float *be
 	apos_y = (float)pos_y / SAMPLESTOMETERS;
 	c_side = hypot(apos_x, apos_y); // Should calibrate to size of arm
 
-	if(c_side < 0.2476) {
+	if(c_side < 0.2288) {
 		*alpha = (acos((-0.0065f / c_side) + (pow(c_side, 2) / (0.2413f * c_side))) + atan2(apos_y, apos_x)) * RADTODEG; // Shoulder joint
 		*beta = acos(1.0013f - (pow(c_side, 2) / 0.0306f)) * RADTODEG; // Elbow joint
 	}
@@ -49,7 +49,7 @@ void IK_solver_threed(unsigned char pos_x, unsigned char pos_y, unsigned char po
 	c_side = hypot(apos_x, apos_y);
 	d_side = hypot(c_side, apos_z );
 
-	if(d_side < 0.2476) {
+	if(d_side < 0.2288) {
 		*alpha = (acos((pow(d_side, 2) - 0.0015726f) / (0.2413f * d_side)) + (1.570796f - atan2( hypot(apos_x, apos_z), apos_y))) * RADTODEG;
 		*beta = acos((0.0306854f - pow(d_side, 2)) / (0.0306451f)) * RADTODEG;
 		*theta = atan2(apos_z, apos_x) * RADTODEG;
