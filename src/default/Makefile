@@ -43,7 +43,7 @@ INCLUDES = -I"C:\Users\FickleBJT\Projects\AsRoA\src\include"
 LIBS = -lc -lm 
 
 ## Objects that must be built in order to link
-OBJECTS = adc.o asroa.o buttons.o IK_calc.o LED.o PWM_gen.o integration.o 
+OBJECTS = adc.o asroa.o buttons.o IK_calc.o LED.o PWM_gen.o integration.o pressure.o 
 
 ## Objects explicitly added by the user
 LINKONLYOBJECTS = 
@@ -71,6 +71,9 @@ PWM_gen.o: ../PWM_gen.c
 	$(CC) $(INCLUDES) $(CFLAGS) -c  $<
 
 integration.o: ../integration.c
+	$(CC) $(INCLUDES) $(CFLAGS) -c  $<
+
+pressure.o: ../pressure.c
 	$(CC) $(INCLUDES) $(CFLAGS) -c  $<
 
 ##Link

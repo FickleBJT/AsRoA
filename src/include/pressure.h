@@ -1,5 +1,5 @@
-#ifndef __INTEGRATION_H
-#define __INTEGRATION_H
+#ifndef __PRESSURE_H
+#define __PRESSURE_H
 /********************************************************************
 * Copyright 2010, 2011 Ryan Bittner <rbittner@gwmail.gwu.edu>
 *
@@ -19,13 +19,10 @@
 * along with AsRoA. If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 
-void reset_velocity(float *velocity, float *last_vel);
+#define PRESSURECUTOFF 128 // sample value cutoff
+#define HOLDTIME 4 // The length that pressure must be held to switch modes
 
-void reset_position(float *position_x, float *position_y, float *position_z);
-
-float integrate_and_zero(unsigned char y_val_one, unsigned char y_val_two, unsigned int x_ms);
-
-float integrate(float y_val_one, float y_val_two, unsigned int x_ms, float current_area);
+unsigned int mode_switch(unsigned int current_mode, unsigned int pressure_val);
 
 
 #endif

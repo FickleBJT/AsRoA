@@ -24,6 +24,7 @@
 #include "extra_macros.h"
 #include "LED.h"
 #include "integration.h"
+#include "pressure.h"
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
@@ -36,12 +37,12 @@ unsigned char which_button = 0x00;
 unsigned char last_sample_x = 0;
 unsigned char last_sample_y = 0;
 unsigned char last_sample_z = 0;
-static float velocity_x = 0;
-static float velocity_y = 0;
-static float velocity_z = 0;
-static float last_vel_x = 0;
-static float last_vel_y = 0;
-static float last_vel_z = 0;
+float velocity_x = 0;
+float velocity_y = 0;
+float velocity_z = 0;
+float last_vel_x = 0;
+float last_vel_y = 0;
+float last_vel_z = 0;
 static float position_x = 0;
 static float position_y = 0;
 static float position_z = 0;
@@ -50,7 +51,7 @@ static float beta = 0.0;
 static float theta = 0.0;
 unsigned char samples[MAXCHANNELS] = {0, 0, 0, 0};
 static unsigned int sample_num = 0;
-unsigned int start = 0;
+unsigned int start_integration = 0;
 
 int main()
 {
@@ -103,32 +104,32 @@ ISR(ADC_vect)
 	if(which_button) {
 		if(which_button == B0) {
 			write_leds(samples[0] + 64);
-			start = 1;
+			start_integration = 1;
 		}
 		else if(which_button == B1) {
 			write_leds(samples[1]);
-			start = 1;
+			start_integration = 1;
 		}
 		else if(which_button == B2) {
 			write_leds(samples[2]);
-			start = 1;
+			start_integration = 1;
 		}
 		else if(which_button == B3) {
 			write_leds(samples[3]);
-			start = 1;
+			start_integration = 1;
 
 		}
-		else if((which_button == B4) && (start == 1)) {
+		else if((which_button == B4) && (start_integration == 1)) {
 			reset_velocity(&velocity_x, &last_vel_x);
 			reset_velocity(&velocity_y, &last_vel_y);
 			reset_velocity(&velocity_z, &last_vel_z);
-			start = 0;
+			start_integration = 0;
 			write_leds(0x81);
 		}
 	}
 	else {
 		clear_leds();
-		start = 1;
+		start_integration = 1;
 	}
 
 
@@ -136,7 +137,7 @@ ISR(ADC_vect)
 	sample_num++;
 	if(sample_num >= MAXCHANNELS) {
 		sample_num = 0;
-		if(start) {
+		if(start_integration) {
 			velocity_x += integrate_and_zero(last_sample_x, samples[0], INTEGRATIONTIME);
 			velocity_y += integrate_and_zero(last_sample_y, samples[1], INTEGRATIONTIME);
 			velocity_z += integrate_and_zero(last_sample_y, samples[2], INTEGRATIONTIME);

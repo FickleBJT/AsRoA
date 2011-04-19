@@ -6,6 +6,7 @@ asroa.o: ../asroa.c \
   C:\Users\FickleBJT\Projects\AsRoA\src\include/extra_macros.h \
   C:\Users\FickleBJT\Projects\AsRoA\src\include/LED.h \
   C:\Users\FickleBJT\Projects\AsRoA\src\include/integration.h \
+  C:\Users\FickleBJT\Projects\AsRoA\src\include/pressure.h \
   c:/winavr-20100110/lib/gcc/../../avr/include/avr/io.h \
   c:/winavr-20100110/lib/gcc/../../avr/include/avr/sfr_defs.h \
   c:/winavr-20100110/lib/gcc/../../avr/include/inttypes.h \
@@ -31,6 +32,8 @@ C:\Users\FickleBJT\Projects\AsRoA\src\include/extra_macros.h:
 C:\Users\FickleBJT\Projects\AsRoA\src\include/LED.h:
 
 C:\Users\FickleBJT\Projects\AsRoA\src\include/integration.h:
+
+C:\Users\FickleBJT\Projects\AsRoA\src\include/pressure.h:
 
 c:/winavr-20100110/lib/gcc/../../avr/include/avr/io.h:
 
