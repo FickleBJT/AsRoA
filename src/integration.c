@@ -20,10 +20,11 @@
 #include <avr/io.h>
 #include <math.h>
 
-static int slope_sign = 0;
-static char y_val_one_signed;
-static char y_val_two_signed;
-static char accel_calibration = -64;
+static float slope_sign = 0;
+static float y_val_one_signed;
+static float y_val_two_signed;
+static float proportion;
+static char accel_calibration = 3;
 
 void reset_velocity(float *velocity, float *last_velocity)
 {
@@ -44,32 +45,32 @@ void calibrate_accel(unsigned char zero_accel)
 float integrate_and_zero(unsigned char y_val_one, unsigned char y_val_two, unsigned int x_ms)
 {
 	float new_area;
-	y_val_one_signed = (char)(y_val_one - (128 + accel_calibration));
-	y_val_two_signed = (char)(y_val_two - (128 + accel_calibration));
+	y_val_one_signed = (float)(y_val_one - (128 + accel_calibration));
+	y_val_two_signed = (float)(y_val_two - (128 + accel_calibration));
 	slope_sign = (y_val_two_signed - y_val_one_signed);
 	
 	if(slope_sign >= 0) {
 		if(y_val_one >= 0x80) {
-			new_area = (((float)(0.5*slope_sign*x_ms)) + (float)(y_val_one_signed*x_ms))/1000.0;
+			new_area = ((0.5f * slope_sign + y_val_one_signed) * ((float)x_ms / 1000.0f));
 		}
 		else if(y_val_two <= 0x80) {
-			new_area = (((float)(-0.5*slope_sign*x_ms)) - (float)(y_val_two_signed*x_ms))/1000.0;
+			new_area = (((-0.5f * slope_sign) + y_val_two_signed) * ((float)x_ms / 1000.0f));
 		}
 		else { // In this case there are two triangles, one above the origin and one below
-			new_area = ((float)(0.5*slope_sign*x_ms)/1000.0)*(y_val_two_signed/(y_val_two_signed - y_val_one_signed)); // y_val_one is negative
-			new_area += ((float)(0.5*slope_sign*x_ms)/1000.0)*(y_val_one_signed/(y_val_two_signed - y_val_one_signed)); // y_val_one is negative
+			proportion = (y_val_two_signed / (y_val_two_signed - y_val_one_signed) + y_val_one_signed / (y_val_two_signed - y_val_one_signed));
+			new_area = (0.5f * slope_sign) * ((float)x_ms / 1000.0f) * proportion;
 		}
 	}
 	else {
 		if(y_val_two >= 0x80) {
-			new_area = (((float)(-0.5*slope_sign*x_ms) - (float)(y_val_two_signed*x_ms))/1000.0);
+			new_area = ((-0.5f * slope_sign + y_val_two_signed) * ((float)x_ms / 1000.0f));
 		}
 		else if(y_val_one <= 0x80) { 
-			new_area = (((float)(0.5*slope_sign*x_ms) - (float)(y_val_one_signed*x_ms))/1000.0);
+			new_area = ((0.5f * slope_sign + y_val_one_signed) * ((float)x_ms / 1000.0f));
 		}
 		else { // In this case there are two triangles, one above the origin and one below
-			new_area = ((float)(0.5*slope_sign*x_ms)/1000.0)*(y_val_two_signed/(y_val_two_signed - y_val_one_signed)); // y_val_two is negative
-			new_area += ((float)(0.5*slope_sign*x_ms)/1000.0)*(y_val_one_signed/(y_val_two_signed - y_val_one_signed)); // y_val_two is negative
+			proportion = (y_val_two_signed / (y_val_two_signed - y_val_one_signed) + y_val_one_signed / (y_val_two_signed - y_val_one_signed));
+			new_area = ((0.5f * slope_sign) * ((float)x_ms / 1000.0f) * proportion);
 		}
 	}
 	return new_area;
@@ -78,32 +79,32 @@ float integrate_and_zero(unsigned char y_val_one, unsigned char y_val_two, unsig
 float integrate(float y_val_one, float y_val_two, unsigned int x_ms, float current_area)
 {
 	float new_area;
-	slope_sign = ((int)y_val_two - (int)y_val_one);
+	slope_sign = (y_val_two - y_val_one);
 	if(slope_sign >= 0) {
 		if(y_val_one >= 0) {
-			new_area = (((float)(0.5*slope_sign*x_ms)) + (float)(y_val_one*x_ms))/1000.0;
+			new_area = ((0.5f * slope_sign + y_val_one) * ((float)x_ms / 1000.0f));
 		}
 		else if(y_val_two <= 0) {
-			new_area = (((float)(-0.5*slope_sign*x_ms)) - (float)(y_val_two*x_ms))/1000.0;
+			new_area = (((-0.5f * slope_sign) + y_val_two) * ((float)x_ms / 1000.0f));
 		}
 		else { // In this case there are two triangles, one above the origin and one below
-			new_area = ((float)(0.5*slope_sign*x_ms)/1000.0)*(y_val_two/(y_val_two - y_val_one)); // y_val_one is negative
-			new_area += ((float)(0.5*slope_sign*x_ms)/1000.0)*(y_val_one/(y_val_two - y_val_one)); // y_val_one is negative
+			proportion = (y_val_two / (y_val_two - y_val_one) + y_val_one / (y_val_two - y_val_one));
+			new_area = (0.5f * slope_sign) * ((float)x_ms / 1000.0f) * proportion;
 		}
 	}
 	else {
 		if(y_val_two >= 0) {
-			new_area = (((float)(-0.5*slope_sign*x_ms) - (float)(y_val_two*x_ms))/1000.0);
+			new_area = ((-0.5f * slope_sign + y_val_two_signed) * ((float)x_ms / 1000.0f));
 		}
 		else if(y_val_one <= 0) { 
-			new_area = (((float)(0.5*slope_sign*x_ms) + (float)(y_val_one*x_ms))/1000.0);
+			new_area = ((0.5f * slope_sign + y_val_one_signed) * ((float)x_ms / 1000.0f));
 		}
 		else { // In this case there are two triangles, one above the origin and one below
-			new_area = ((float)(0.5*slope_sign*x_ms)/1000.0)*(y_val_two/(y_val_two - y_val_one)); // y_val_two is negative
-			new_area += ((float)(0.5*slope_sign*x_ms)/1000.0)*(y_val_one/(y_val_two - y_val_one)); // y_val_two is negative
+			proportion = (y_val_two / (y_val_two - y_val_one) + y_val_one / (y_val_two - y_val_one));
+			new_area = ((0.5f * slope_sign) * ((float)x_ms / 1000.0f) * proportion);
 		}
 	}
-	if(current_area + new_area < 0.2288) { // May not work
+	if((current_area + new_area) < 0.2288) { // May not work
 		return (current_area + new_area);
 	}
 	else {

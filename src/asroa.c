@@ -103,12 +103,17 @@ ISR(ADC_vect)
 {
 	if(which_button) {
 		if(which_button == B0) {
-			write_leds(samples[0] + 64);
+			write_leds(samples[0] - 3);
 			start_integration = 1;
 		}
 		else if(which_button == B1) {
-			write_leds(samples[1]);
-			start_integration = 1;
+			reset_velocity(&velocity_x, &last_vel_x);
+			reset_velocity(&velocity_y, &last_vel_y);
+			reset_velocity(&velocity_z, &last_vel_z);
+			OCR1A = pwm_scale(0, 1);
+			OCR1B = pwm_scale(90, 2);
+			write_leds(0xAA);
+			//start_integration = 1;
 		}
 		else if(which_button == B2) {
 			write_leds(samples[2]);
@@ -153,7 +158,7 @@ ISR(ADC_vect)
 		}
 
 		IK_solver_threed(position_x, samples[1], samples[2], &alpha, &beta, &theta);
-		OCR0 = pwm_scale(theta, 0);
+	//	OCR0 = pwm_scale(theta, 0);
 		OCR1A = pwm_scale(alpha, 1);
 		OCR1B = pwm_scale(beta, 2);
 	//	OCR2 = (unsigned char)pwm_scale((float)samples[3], 4);
