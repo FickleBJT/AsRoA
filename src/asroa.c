@@ -32,7 +32,7 @@
 static unsigned short delay_counter = 0;
 static unsigned short adc_count = 0;
 
-unsigned char which_button = 0x00;
+unsigned char which_button = 0x04;
 
 unsigned char last_sample_x = 0;
 unsigned char last_sample_y = 0;
@@ -43,7 +43,7 @@ float velocity_z = 0;
 float last_vel_x = 0;
 float last_vel_y = 0;
 float last_vel_z = 0;
-static float position_x = 0;
+static float position_x = 0.1144;
 static float position_y = 0;
 static float position_z = 0;
 static float alpha = 0.0;
@@ -107,20 +107,22 @@ ISR(ADC_vect)
 			start_integration = 1;
 		}
 		else if(which_button == B1) {
-			reset_velocity(&velocity_x, &last_vel_x);
-			reset_velocity(&velocity_y, &last_vel_y);
-			reset_velocity(&velocity_z, &last_vel_z);
-			OCR1A = pwm_scale(0, 1);
-			OCR1B = pwm_scale(90, 2);
-			write_leds(0xAA);
+			//reset_velocity(&velocity_x, &last_vel_x);
+			//reset_velocity(&velocity_y, &last_vel_y);
+			//reset_velocity(&velocity_z, &last_vel_z);
+			write_leds((unsigned char)(velocity_x * SAMPLESTOMETERS));
 			//start_integration = 1;
 		}
 		else if(which_button == B2) {
-			write_leds(samples[2]);
+			write_leds((unsigned char)(position_x * SAMPLESTOMETERS));
+			//write_leds(samples[1]);
 			start_integration = 1;
 		}
 		else if(which_button == B3) {
-			write_leds(samples[3]);
+			reset_velocity(&velocity_x, &last_vel_x);
+			reset_velocity(&velocity_y, &last_vel_y);
+			reset_velocity(&velocity_z, &last_vel_z);
+			//write_leds(samples[2]);
 			start_integration = 1;
 
 		}
@@ -143,9 +145,9 @@ ISR(ADC_vect)
 	if(sample_num >= MAXCHANNELS) {
 		sample_num = 0;
 		if(start_integration) {
-			velocity_x += integrate_and_zero(last_sample_x, samples[0], INTEGRATIONTIME);
-			velocity_y += integrate_and_zero(last_sample_y, samples[1], INTEGRATIONTIME);
-			velocity_z += integrate_and_zero(last_sample_y, samples[2], INTEGRATIONTIME);
+			velocity_x = integrate_and_zero(last_sample_x, samples[0], INTEGRATIONTIME, velocity_x);
+			velocity_y = integrate_and_zero(last_sample_y, samples[1], INTEGRATIONTIME, velocity_y);
+			velocity_z = integrate_and_zero(last_sample_z, samples[2], INTEGRATIONTIME, velocity_z);
 			position_x = integrate(last_vel_x, velocity_x, INTEGRATIONTIME, position_x);
 			position_y = integrate(last_vel_y, velocity_y, INTEGRATIONTIME, position_y);
 			position_z = integrate(last_vel_z, velocity_z, INTEGRATIONTIME, position_z);
@@ -157,7 +159,7 @@ ISR(ADC_vect)
 			last_vel_z = velocity_z;
 		}
 
-		IK_solver_threed(position_x, samples[1], samples[2], &alpha, &beta, &theta);
+		IK_solver_threed((position_x * SAMPLESTOMETERS), samples[1], 128, &alpha, &beta, &theta);
 	//	OCR0 = pwm_scale(theta, 0);
 		OCR1A = pwm_scale(alpha, 1);
 		OCR1B = pwm_scale(beta, 2);

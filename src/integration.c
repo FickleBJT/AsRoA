@@ -42,7 +42,7 @@ void calibrate_accel(unsigned char zero_accel)
 	accel_calibration = (zero_accel - 128);
 }
 
-float integrate_and_zero(unsigned char y_val_one, unsigned char y_val_two, unsigned int x_ms)
+float integrate_and_zero(unsigned char y_val_one, unsigned char y_val_two, unsigned int x_ms, float current_area)
 {
 	float new_area;
 	y_val_one_signed = (float)(y_val_one - (128 + accel_calibration));
@@ -73,6 +73,13 @@ float integrate_and_zero(unsigned char y_val_one, unsigned char y_val_two, unsig
 			new_area = ((0.5f * slope_sign) * ((float)x_ms / 1000.0f) * proportion);
 		}
 	}
+	if((current_area + new_area) < 0.2288) {
+		return (current_area + new_area);
+	}
+	else {
+		return current_area;
+	}
+		
 	return new_area;
 }
 
@@ -104,7 +111,7 @@ float integrate(float y_val_one, float y_val_two, unsigned int x_ms, float curre
 			new_area = ((0.5f * slope_sign) * ((float)x_ms / 1000.0f) * proportion);
 		}
 	}
-	if((current_area + new_area) < 0.2288) { // May not work
+	if((current_area + new_area) < 0.2288) {
 		return (current_area + new_area);
 	}
 	else {

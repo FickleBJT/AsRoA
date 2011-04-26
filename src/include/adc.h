@@ -21,9 +21,9 @@
 ********************************************************************/
 
 #define MAXCHANNELS 4
-#define ADCPERIOD 1
+#define ADCPERIOD 5
 #define TIMERTWOPERIOD 4.08
-#define INTEGRATIONTIME (MAXCHANNELS * ADCPERIOD * TIMERTWOPERIOD)
+#define INTEGRATIONTIME (MAXCHANNELS * ADCPERIOD * TIMERTWOPERIOD / 16)
 
 #define ENABLEADC    0x80
 #define STARTCONV    0x40

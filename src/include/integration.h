@@ -23,7 +23,7 @@ void reset_velocity(float *velocity, float *last_vel);
 
 void reset_position(float *position_x, float *position_y, float *position_z);
 
-float integrate_and_zero(unsigned char y_val_one, unsigned char y_val_two, unsigned int x_ms);
+float integrate_and_zero(unsigned char y_val_one, unsigned char y_val_two, unsigned int x_ms, float current_area);
 
 float integrate(float y_val_one, float y_val_two, unsigned int x_ms, float current_area);
 
