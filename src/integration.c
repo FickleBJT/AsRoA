@@ -100,9 +100,12 @@ float integrate(float y_val_one, float y_val_two, unsigned int x_ms, float curre
 		else if(y_val_two <= -2) {
 			new_area = (((-0.5f * slope_sign) + y_val_two) * ((float)x_ms / 1000.0f));
 		}
-		else if((y_val_one > 0) && (y_val_two < 0) { // In this case there are two triangles, one above the origin and one below
+		else if((y_val_one > 0) && (y_val_two < 0)) { // In this case there are two triangles, one above the origin and one below
 			proportion = (y_val_two / (y_val_two - y_val_one) + y_val_one / (y_val_two - y_val_one));
 			new_area = (0.5f * slope_sign) * ((float)x_ms / 1000.0f) * proportion;
+		}
+		else {
+			new_area = 0;
 		}
 	}
 	else {
@@ -115,6 +118,9 @@ float integrate(float y_val_one, float y_val_two, unsigned int x_ms, float curre
 		else if((y_val_one < 0) && (y_val_two > 0)) { // In this case there are two triangles, one above the origin and one below
 			proportion = (y_val_two / (y_val_two - y_val_one) + y_val_one / (y_val_two - y_val_one));
 			new_area = ((0.5f * slope_sign) * ((float)x_ms / 1000.0f) * proportion);
+		}
+		else {
+			new_area = 0;
 		}
 	}
 	if(fabs(current_area + new_area) < MAXPOS) {
