@@ -19,6 +19,9 @@
 * along with AsRoA. If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 
+#define SAMPLETOMIL 15.95052
+#define MAXPOS 228.8 // mm
+#define MAXVEL 114.4 // mm/s
 void reset_velocity(float *velocity, float *last_vel);
 
 void reset_position(float *position_x, float *position_y, float *position_z);

@@ -20,10 +20,10 @@
 * along with AsRoA. If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 
-#define MAXCHANNELS 4
-#define ADCPERIOD 5
+#define MAXCHANNELS 1
+#define ADCPERIOD 1
 #define TIMERTWOPERIOD 4.08
-#define INTEGRATIONTIME (MAXCHANNELS * ADCPERIOD * TIMERTWOPERIOD / 16)
+#define INTEGRATIONTIME (MAXCHANNELS * ADCPERIOD * TIMERTWOPERIOD)
 
 #define ENABLEADC    0x80
 #define STARTCONV    0x40

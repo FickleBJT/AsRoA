@@ -49,7 +49,7 @@ static float position_z = 0;
 static float alpha = 0.0;
 static float beta = 0.0;
 static float theta = 0.0;
-unsigned char samples[MAXCHANNELS] = {0, 0, 0, 0};
+unsigned char samples[MAXCHANNELS] = {0};
 static unsigned int sample_num = 0;
 unsigned int start_integration = 0;
 
@@ -103,18 +103,18 @@ ISR(ADC_vect)
 {
 	if(which_button) {
 		if(which_button == B0) {
-			write_leds(samples[0] - 3);
+			write_leds(samples[0] - 2);
 			start_integration = 1;
 		}
 		else if(which_button == B1) {
 			//reset_velocity(&velocity_x, &last_vel_x);
 			//reset_velocity(&velocity_y, &last_vel_y);
 			//reset_velocity(&velocity_z, &last_vel_z);
-			write_leds((unsigned char)(velocity_x * SAMPLESTOMETERS));
+			write_leds((unsigned char)(velocity_x));
 			//start_integration = 1;
 		}
 		else if(which_button == B2) {
-			write_leds((unsigned char)(position_x * SAMPLESTOMETERS));
+			write_leds((unsigned char)(position_x));
 			//write_leds(samples[1]);
 			start_integration = 1;
 		}
@@ -159,7 +159,7 @@ ISR(ADC_vect)
 			last_vel_z = velocity_z;
 		}
 
-		IK_solver_threed((position_x * SAMPLESTOMETERS), samples[1], 128, &alpha, &beta, &theta);
+		IK_solver_threed(position_x, 64, 0, &alpha, &beta, &theta);
 	//	OCR0 = pwm_scale(theta, 0);
 		OCR1A = pwm_scale(alpha, 1);
 		OCR1B = pwm_scale(beta, 2);
