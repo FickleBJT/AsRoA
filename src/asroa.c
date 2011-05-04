@@ -30,9 +30,10 @@
 #include <avr/interrupt.h>
 
 static unsigned short delay_counter = 0;
-static unsigned short adc_count = 0;
+static unsigned int adc_count = 0;
 
-unsigned char which_button = 0x04;
+unsigned char which_button = 0x00;
+unsigned int current_mode = 0;
 
 unsigned char last_sample_x = 0;
 unsigned char last_sample_y = 0;
@@ -43,7 +44,7 @@ float velocity_z = 0;
 float last_vel_x = 0;
 float last_vel_y = 0;
 float last_vel_z = 0;
-static float position_x = 0.1144;
+static float position_x = 114.4;
 static float position_y = 0;
 static float position_z = 0;
 static float alpha = 0.0;
@@ -59,6 +60,7 @@ int main()
 	init_adc();
 	init_pwm();
 
+	GICR |= 0x20; // External Interrupt 2 (INT2)
 	TIMSK |= TIMOVF2 + TIMOVF0 + TIMOVF1; // Interrupts
 
 	sei();
@@ -85,65 +87,83 @@ ISR(TIMER0_OVF_vect) // Triggers every 4.08 ms @ 8 MHz
 
 ISR(TIMER1_OVF_vect)
 {
+	if(which_button) {
+		if(which_button == B0) {
+			if(current_mode <= 2) {
+				write_leds(samples[0] - 2);
+				start_integration = 1;
+			}
+			else {
+				start_integration = 0;
+			}
+		}
+		else if(which_button == B1) {
+			if(current_mode <= 2) {
+				write_leds(samples[1]);
+				start_integration = 1;
+			}
+			else {
+				start_integration = 0;
+			}
+		}
+		else if(which_button == B2) {
+			if(current_mode <= 2) {
+				write_leds(samples[2]);
+				start_integration = 1;
+			}
+			else {
+				start_integration = 0;
+			}
+		}
+		else if(which_button == B3) {
+			write_leds(current_mode);
+		}
+		else if((which_button == B4) && (start_integration == 1)) {
 
-}
-
-ISR(TIMER2_OVF_vect) // Triggers every 4.08 ms @ 8 MHz
-{
-	if(adc_count < ADCPERIOD) {
-		adc_count++;
+		}
 	}
 	else {
-		adc_count = 0;
-		take_sample();
+		clear_leds();
+
+	}
+}
+
+ISR(TIMER2_OVF_vect) // Triggers every 2.04 ms @ 8 MHz
+{
+/*
+	if(!TIMERMODE) {
+		if(adc_count < ADCPERIOD) {
+			adc_count++;
+		}
+		else {
+			adc_count = 0;
+			take_sample();
+		}
+	}
+*/
+}
+
+ISR(INT2_vect) // Triggered on PINB2
+{
+	if(!TIMERMODE) {
+		if(adc_count < ADCPERIOD) {
+			adc_count++;
+		}
+		else {
+			adc_count = 0;
+			take_sample();
+		}
 	}
 }
 
 ISR(ADC_vect)
 {
-	if(which_button) {
-		if(which_button == B0) {
-			write_leds(samples[0] - 2);
-			start_integration = 1;
-		}
-		else if(which_button == B1) {
-			//reset_velocity(&velocity_x, &last_vel_x);
-			//reset_velocity(&velocity_y, &last_vel_y);
-			//reset_velocity(&velocity_z, &last_vel_z);
-			write_leds((unsigned char)(velocity_x));
-			//start_integration = 1;
-		}
-		else if(which_button == B2) {
-			write_leds((unsigned char)(position_x));
-			//write_leds(samples[1]);
-			start_integration = 1;
-		}
-		else if(which_button == B3) {
-			reset_velocity(&velocity_x, &last_vel_x);
-			reset_velocity(&velocity_y, &last_vel_y);
-			reset_velocity(&velocity_z, &last_vel_z);
-			//write_leds(samples[2]);
-			start_integration = 1;
-
-		}
-		else if((which_button == B4) && (start_integration == 1)) {
-			reset_velocity(&velocity_x, &last_vel_x);
-			reset_velocity(&velocity_y, &last_vel_y);
-			reset_velocity(&velocity_z, &last_vel_z);
-			start_integration = 0;
-			write_leds(0x81);
-		}
-	}
-	else {
-		clear_leds();
-		start_integration = 1;
-	}
-
 
 	samples[sample_num] = ADCH; 
 	sample_num++;
 	if(sample_num >= MAXCHANNELS) {
 		sample_num = 0;
+		current_mode = mode_switch(current_mode, samples[4], samples[5]);
 		if(start_integration) {
 			velocity_x = integrate_and_zero(last_sample_x, samples[0], INTEGRATIONTIME, velocity_x);
 			velocity_y = integrate_and_zero(last_sample_y, samples[1], INTEGRATIONTIME, velocity_y);
@@ -159,8 +179,8 @@ ISR(ADC_vect)
 			last_vel_z = velocity_z;
 		}
 
-		IK_solver_threed(position_x, 64, 0, &alpha, &beta, &theta);
-	//	OCR0 = pwm_scale(theta, 0);
+		IK_solver_threed(position_x, 127, 127, &alpha, &beta, &theta);
+		OCR0 = pwm_scale(theta, 0);
 		OCR1A = pwm_scale(alpha, 1);
 		OCR1B = pwm_scale(beta, 2);
 	//	OCR2 = (unsigned char)pwm_scale((float)samples[3], 4);

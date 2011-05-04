@@ -96,7 +96,7 @@ float pwm_scale(float position, unsigned int joint)
 
 		case(1): { // Shoulder
 			if(position < 135) {
-				return ((5.2296f * (135.0f - position)) + 294.0f); 
+				return ((5.2296f * (float)(135 - (int)position)) + 294.0f); 
 			}
 			else {
 				return 0x03CF;
@@ -117,7 +117,7 @@ float pwm_scale(float position, unsigned int joint)
 		}
 
 		case(4): { // Gripper
-			return ((0.954f * (255 - position)) - 34.0f); 
+			return ((0.954f * (float)(255 - (int)position)) - 34.0f); 
 		}
 
 		default: {

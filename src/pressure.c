@@ -23,11 +23,11 @@
 
 static unsigned int hold_count = 0;
 
-unsigned int mode_switch(unsigned int current_mode, unsigned int pressure_val)
+unsigned int mode_switch(unsigned int current_mode, unsigned int glove_press_val, unsigned int bot_press_val)
 {
 	switch(current_mode) {
 		case(0): { // follow mode, no inclination measurement
-			if(pressure_val > PRESSURECUTOFF) {
+			if(glove_press_val > PRESSURECUTOFF) {
 				hold_count++;
 				return 0;
 			}
@@ -42,7 +42,7 @@ unsigned int mode_switch(unsigned int current_mode, unsigned int pressure_val)
 		}
 
 		case(1): { // mirror mode, no inclination measurement
-			if(pressure_val > PRESSURECUTOFF) {
+			if(glove_press_val > PRESSURECUTOFF) {
 				hold_count++;
 				return 1;
 			}
@@ -57,7 +57,7 @@ unsigned int mode_switch(unsigned int current_mode, unsigned int pressure_val)
 		}
 
 		case(2): { // inclination measurement, will continue with follow mode
-			if(pressure_val > PRESSURECUTOFF) {
+			if(bot_press_val > PRESSURECUTOFF) {
 				hold_count++;
 				return 2;
 			}
@@ -72,7 +72,7 @@ unsigned int mode_switch(unsigned int current_mode, unsigned int pressure_val)
 		}
 
 		case(3): { // inclination measurement, will continue with mirror mode
-			if(pressure_val > PRESSURECUTOFF) {
+			if(bot_press_val > PRESSURECUTOFF) {
 				hold_count++;
 				return 3;
 			}

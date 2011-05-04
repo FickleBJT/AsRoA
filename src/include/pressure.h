@@ -19,10 +19,10 @@
 * along with AsRoA. If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 
-#define PRESSURECUTOFF 128 // sample value cutoff
-#define HOLDTIME 4 // The length that pressure must be held to switch modes
+#define PRESSURECUTOFF 16 // sample value cutoff
+#define HOLDTIME 200 // The length that pressure must be held to switch modes
 
-unsigned int mode_switch(unsigned int current_mode, unsigned int pressure_val);
+unsigned int mode_switch(unsigned int current_mode, unsigned int glove_press_val, unsigned int bot_press_val);
 
 
 #endif

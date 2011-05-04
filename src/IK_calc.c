@@ -43,9 +43,14 @@ void IK_solver(unsigned char pos_x, unsigned char pos_y, float *alpha, float *be
 
 void IK_solver_threed(unsigned char pos_x, unsigned char pos_y, unsigned char pos_z, float *alpha, float *beta, float *theta)
 {
-	apos_x = (float)pos_x;
-	apos_y = (float)pos_y;
-	apos_z = (float)pos_z;
+	if(pos_x > 0x4D) {
+		apos_x = ((float)pos_x);
+	}
+	else {
+		apos_x = 58.0;
+	}
+	apos_y = ((float)pos_y);
+	apos_z = ((float)pos_z - 128.0);
 	c_side = hypot(apos_x, apos_y);
 	d_side = hypot(c_side, apos_z );
 

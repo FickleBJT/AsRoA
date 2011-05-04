@@ -25,9 +25,10 @@
 
 void init_adc()
 {
-	ADCSRA |= ENABLEADC + ADCINTENABLE + ADCPRESCALE2 + ADCPRESCALE1;
+	ADCSRA |= ENABLEADC + ADCINTENABLE + ADCPRESCALE2 + ADCPRESCALE1 + ADCPRESCALE0;
 	ADMUX |= LADJUST; // Left adjust result
 	DDRA &= 0x00; // Make sure Port A is set to input
+	DDRB &= 0xFB; // Set PINB2 
 }
 
 void take_sample(void)

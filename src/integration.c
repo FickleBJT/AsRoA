@@ -47,8 +47,8 @@ void calibrate_accel(unsigned char zero_accel)
 float integrate_and_zero(unsigned char y_val_one, unsigned char y_val_two, unsigned int x_ms, float current_area)
 {
 	float new_area = 0;
-	y_val_one_signed = (float)(((int)y_val_one - (128 + accel_calibration)) * SAMPLETOMIL);
-	y_val_two_signed = (float)(((int)y_val_two - (128 + accel_calibration)) * SAMPLETOMIL);
+	y_val_one_signed = (float)(((int)y_val_one - (128 + accel_calibration))) * SAMPLETOMIL;
+	y_val_two_signed = (float)(((int)y_val_two - (128 + accel_calibration))) * SAMPLETOMIL;
 	slope_sign = (y_val_two_signed - y_val_one_signed);
 	
 	if(slope_sign >= 0) {
@@ -123,7 +123,7 @@ float integrate(float y_val_one, float y_val_two, unsigned int x_ms, float curre
 			new_area = 0;
 		}
 	}
-	if(fabs(current_area + new_area) < MAXPOS) {
+	if(current_area + new_area < MAXPOS && (current_area + new_area) > 0.01) {
 		return (current_area + new_area);
 	}
 	else {
