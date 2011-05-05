@@ -90,7 +90,7 @@ void disable_pwm(unsigned int channel) // channel 0-3
 float pwm_scale(float position, unsigned int joint)
 {
 	switch(joint) {
-		case(0): { // Base Rotate
+		case(0): { // Base Rotate or Wrist
 			return ((0.6278f * position) + 37.0f);
 		}
 
@@ -112,12 +112,9 @@ float pwm_scale(float position, unsigned int joint)
 			}
 		}
 
-		case(3): { // Wrist
-			return position;
-		}
-
-		case(4): { // Gripper
-			return ((0.954f * (float)(255 - (int)position)) - 34.0f); 
+		case(3): { // Gripper
+		return ((1.8f * (float)(255 - (int)position)) - 34.0f);
+		//	return ((0.954f * (float)(255 - (int)position)) + 34.0f); 
 		}
 
 		default: {

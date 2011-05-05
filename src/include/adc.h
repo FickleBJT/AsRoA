@@ -21,8 +21,8 @@
 ********************************************************************/
 
 #define TIMERMODE 1 // 1 -> External timer used for ADC; 0 -> Internal timer used for ADC
-#define MAXCHANNELS 6
-#define ADCPERIOD 2
+#define MAXCHANNELS 8
+#define ADCPERIOD 1
 #define TIMERTWOPERIOD 2.04
 #define EXTERNALTIMERPERIOD 0.1
 

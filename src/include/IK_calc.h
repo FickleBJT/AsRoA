@@ -27,5 +27,7 @@ void IK_solver(unsigned char pos_x, unsigned char pos_y, float *alpha, float *be
 
 void IK_solver_threed(unsigned char pos_x, unsigned char pos_y, unsigned char pos_z, float *alpha, float *beta, float *theta);
 
+float inclination_solver(unsigned char x_val, unsigned char z_val);
+
 #endif
 

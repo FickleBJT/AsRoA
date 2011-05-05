@@ -31,6 +31,7 @@
 
 static unsigned short delay_counter = 0;
 static unsigned int adc_count = 0;
+static unsigned int servo_select = 0; // 0 -> Base rotate servo; 1 -> Wrist Inclination servo
 
 unsigned char which_button = 0x00;
 unsigned int current_mode = 0;
@@ -47,9 +48,10 @@ float last_vel_z = 0;
 static float position_x = 114.4;
 static float position_y = 0;
 static float position_z = 0;
-static float alpha = 0.0;
-static float beta = 0.0;
-static float theta = 0.0;
+float alpha = 0.0;
+float beta = 0.0;
+float echo = 0.0;
+float theta = 0.0;
 unsigned char samples[MAXCHANNELS] = {0};
 static unsigned int sample_num = 0;
 unsigned int start_integration = 0;
@@ -89,30 +91,33 @@ ISR(TIMER1_OVF_vect)
 {
 	if(which_button) {
 		if(which_button == B0) {
-			if(current_mode <= 2) {
+			if(current_mode < 2) {
 				write_leds(samples[0] - 2);
 				start_integration = 1;
 			}
 			else {
 				start_integration = 0;
+				write_leds(samples[6]);
 			}
 		}
 		else if(which_button == B1) {
-			if(current_mode <= 2) {
-				write_leds(samples[1]);
+			if(current_mode < 2) {
+				write_leds(samples[4]);
 				start_integration = 1;
 			}
 			else {
 				start_integration = 0;
+				write_leds(samples[7]);
 			}
 		}
 		else if(which_button == B2) {
-			if(current_mode <= 2) {
-				write_leds(samples[2]);
+			if(current_mode < 2) {
+				write_leds(samples[3]);
 				start_integration = 1;
 			}
 			else {
 				start_integration = 0;
+				write_leds((unsigned char)echo);
 			}
 		}
 		else if(which_button == B3) {
@@ -130,7 +135,7 @@ ISR(TIMER1_OVF_vect)
 
 ISR(TIMER2_OVF_vect) // Triggers every 2.04 ms @ 8 MHz
 {
-/*
+
 	if(!TIMERMODE) {
 		if(adc_count < ADCPERIOD) {
 			adc_count++;
@@ -140,12 +145,12 @@ ISR(TIMER2_OVF_vect) // Triggers every 2.04 ms @ 8 MHz
 			take_sample();
 		}
 	}
-*/
+
 }
 
 ISR(INT2_vect) // Triggered on PINB2
 {
-	if(!TIMERMODE) {
+	if(TIMERMODE) {
 		if(adc_count < ADCPERIOD) {
 			adc_count++;
 		}
@@ -177,13 +182,20 @@ ISR(ADC_vect)
 			last_vel_x = velocity_x;
 			last_vel_y = velocity_y;
 			last_vel_z = velocity_z;
+		
+
+			IK_solver_threed(samples[0], samples[1], 127, &alpha, &beta, &theta);
+			OCR0 = pwm_scale(alpha, 0);
+		}
+		
+		else if(current_mode >= 2) {
+			echo = inclination_solver(samples[7], samples[6]);
+			OCR0 = pwm_scale(echo, 0);
 		}
 
-		IK_solver_threed(position_x, 127, 127, &alpha, &beta, &theta);
-		OCR0 = pwm_scale(theta, 0);
-		OCR1A = pwm_scale(alpha, 1);
-		OCR1B = pwm_scale(beta, 2);
-	//	OCR2 = (unsigned char)pwm_scale((float)samples[3], 4);
+		//OCR1A = pwm_scale(alpha, 1);
+		//OCR1B = pwm_scale(beta, 2);
+		OCR2 = (unsigned char)pwm_scale(samples[3], 3);
 	}
 
 	adc_set_channel(sample_num);

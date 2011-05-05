@@ -31,13 +31,17 @@ unsigned int mode_switch(unsigned int current_mode, unsigned int glove_press_val
 				hold_count++;
 				return 0;
 			}
-			else if(hold_count < HOLDTIME) {
+			else if((hold_count < HOLDTIME) && (hold_count > MINTIME)) {
 				hold_count = 0;
 				return 2;
 			}
-			else {
+			else if(hold_count > HOLDTIME) {
 				hold_count = 0;
 				return 1;
+			}
+			else {
+				hold_count = 0;
+				return 0;
 			}
 		}
 

@@ -60,3 +60,15 @@ void IK_solver_threed(unsigned char pos_x, unsigned char pos_y, unsigned char po
 		*theta = atan2(apos_z, apos_x) * RADTODEG;
 	}
 }
+
+float inclination_solver(unsigned char x_val, unsigned char z_val)
+{
+	float echo;
+	if(x_val > 84) {
+		echo = (5.625f * (float)(z_val - 84));
+	}
+	else {
+		echo = (180 - (5.625f * (float)(z_val - 84)));
+	}
+	return echo;
+}
