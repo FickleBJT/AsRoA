@@ -20,7 +20,7 @@
 * along with AsRoA. If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 
-#define TIMERMODE 1 // 1 -> External timer used for ADC; 0 -> Internal timer used for ADC
+#define TIMERMODE 0 // 1 -> External timer used for ADC; 0 -> Internal timer used for ADC
 #define MAXCHANNELS 8
 #define ADCPERIOD 1
 #define TIMERTWOPERIOD 2.04
@@ -29,7 +29,7 @@
 #if TIMERMODE
 	#define INTEGRATIONTIME (MAXCHANNELS * ADCPERIOD * EXTERNALTIMERPERIOD)
 #else
-	#define INTEGRATIONTIME (MAXCHANNELS * ADCPERIOD * TIMERTWOPERIOD)
+	#define INTEGRATIONTIME (MAXCHANNELS * ADCPERIOD * TIMERTWOPERIOD * 5)
 #endif
 
 #define ENABLEADC    0x80

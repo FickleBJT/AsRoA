@@ -19,18 +19,19 @@
 * along with AsRoA. If not, see <http://www.gnu.org/licenses/>.
 ********************************************************************/
 
+//#define SAMPLETOMIL 2
 #define SAMPLETOMIL 15.95052
 #define MAXPOS 228.8 // mm
-#define MAXVEL 114.4 // mm/s
+#define MAXVEL 228.8 // mm/s
 
 
 void reset_velocity(float *velocity, float *last_vel);
 
 void reset_position(float *position_x, float *position_y, float *position_z);
 
-float integrate_and_zero(unsigned char y_val_one, unsigned char y_val_two, unsigned int x_ms, float current_area);
+float integrate_and_zero(unsigned char y_val_one, unsigned char y_val_two, float x_ms, float current_area);
 
-float integrate(float y_val_one, float y_val_two, unsigned int x_ms, float current_area);
+float integrate(float y_val_one, float y_val_two, float x_ms, float current_area);
 
 
 #endif
