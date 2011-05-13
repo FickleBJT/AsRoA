@@ -31,13 +31,13 @@ unsigned int mode_switch(unsigned int current_mode, unsigned int glove_press_val
 				hold_count++;
 				return 0;
 			}
-			else if((hold_count < HOLDTIME) && (hold_count > MINTIME)) {
-				hold_count = 0;
-				return 2;
-			}
 			else if(hold_count > HOLDTIME) {
 				hold_count = 0;
 				return 1;
+			}
+			else if((hold_count < HOLDTIME) && (hold_count > MINTIME)) {
+				hold_count = 0;
+				return 2;
 			}
 			else {
 				hold_count = 0;
@@ -50,7 +50,11 @@ unsigned int mode_switch(unsigned int current_mode, unsigned int glove_press_val
 				hold_count++;
 				return 1;
 			}
-			else if(hold_count < HOLDTIME) {
+			else if(hold_count > HOLDTIME) {
+				hold_count = 0;
+				return 0;
+			}
+			else if((hold_count < HOLDTIME) && (hold_count > MINTIME)) {
 				hold_count = 0;
 				return 3;
 			}
@@ -61,32 +65,42 @@ unsigned int mode_switch(unsigned int current_mode, unsigned int glove_press_val
 		}
 
 		case(2): { // inclination measurement, will continue with follow mode
-			if(bot_press_val > PRESSURECUTOFF) {
+
+			if(bot_press_val > PRESSURECUTOFFBOT) {
 				hold_count++;
+				if(hold_count > HOLDTIME) {
+					hold_count = 0;
+					return 0;
+				}
 				return 2;
 			}
-			else if(hold_count < HOLDTIME) {
+			else if((hold_count < HOLDTIME) && (hold_count > MINTIME)) {
 				hold_count = 0;
 				return 2;
 			}
 			else {
 				hold_count = 0;
-				return 0;
+				return 2;
 			}
 		}
 
 		case(3): { // inclination measurement, will continue with mirror mode
-			if(bot_press_val > PRESSURECUTOFF) {
+
+			if(bot_press_val > PRESSURECUTOFFBOT) {
 				hold_count++;
+				if(hold_count > HOLDTIME) {
+					hold_count = 0;
+					return 1;
+				}
 				return 3;
 			}
-			else if(hold_count < HOLDTIME) {
+			else if((hold_count <= HOLDTIME) && (hold_count > MINTIME)) {
 				hold_count = 0;
 				return 3;
 			}
 			else {
 				hold_count = 0;
-				return 1;
+				return 3;
 			}
 		}
 

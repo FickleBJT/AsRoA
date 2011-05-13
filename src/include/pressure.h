@@ -20,8 +20,9 @@
 ********************************************************************/
 
 #define PRESSURECUTOFF 48 // sample value cutoff
-#define HOLDTIME 100 // The length that pressure must be held to switch modes
-#define MINTIME 20
+#define PRESSURECUTOFFBOT 53 // Cutoff
+#define HOLDTIME 25 // The length that pressure must be held to switch modes
+#define MINTIME 5
 
 unsigned int mode_switch(unsigned int current_mode, unsigned int glove_press_val, unsigned int bot_press_val);
 

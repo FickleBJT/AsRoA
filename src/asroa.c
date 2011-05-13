@@ -71,9 +71,17 @@ int main()
 	GICR |= 0x20; // External Interrupt 2 (INT2)
 	TIMSK |= TIMOVF2 + TIMOVF0 + TIMOVF1; // Interrupts
 
+	DDRB |= 0x80;
+
 	sei();
 
 	while(1) {
+		if(servo_select) {
+			PORTB |= 0x80;
+		}
+		else {
+			PORTB &= ~0x80;
+		}
 	;	 // wait for interrupts
 	}
 	return 0;
@@ -196,14 +204,18 @@ ISR(ADC_vect)
 			}		
 
 
-			IK_solver_threed(127, 127, 127, &alpha, &beta, &theta);
+			IK_solver_threed(samples[0], samples[1], samples[2], &alpha, &beta, &theta);
+			servo_select = 0;
 			OCR0 = pwm_scale(alpha, 0);
 
 		}
 		
 		else if(current_mode >= 2) {
 			echo = inclination_solver(samples[7], samples[6]);
+			servo_select = 1;
 			OCR0 = pwm_scale(echo, 0);
+
+
 		}
 
 		OCR1A = pwm_scale(alpha, 1);
